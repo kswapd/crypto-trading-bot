@@ -1,3 +1,4 @@
+#! /usr/bin/python
 import ccxt as ct
 import pprint as pp
 import trade 

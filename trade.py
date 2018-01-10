@@ -1,7 +1,9 @@
+#! /usr/bin/python
 import ccxt as ct
 import pprint
 import trade 
 import time
+import conf
 class auto_trade:
     def prt(self,info):
         pprint.pprint(info)
@@ -12,6 +14,17 @@ class auto_trade:
          self.coinmarket = ct.coinmarketcap()
          self.liqui = ct.bitfinex()
          print(ct.exchanges)
+         print(self.k.hasFetchOHLCV, self.k.rateLimit)
+         print(self.y.hasFetchOHLCV, self.y.rateLimit)
+         print(self.p.hasFetchOHLCV, self.p.rateLimit)
+         print(self.coinmarket.hasFetchOHLCV, self.coinmarket.rateLimit)
+         keys_conf = conf.TradeKeys()
+         print(keys_conf.keys_info)
+         self.k.apiKey = keys_conf.keys_info['kraken']['public']
+         self.k.secret = keys_conf.keys_info['kraken']['secret']
+         print (self.k.fetch_balance ())
+         print (self.k.fetch_orders ())
+         #print(self.k.fetch_ohlcv('LTC/USD', '1d'))
     def start(self):
         for i in range(0,10):
             r = self.k
