@@ -18,7 +18,7 @@ class auto_trade:
             start = time.time()
             ticker = r.fetch_ticker('LTC/USD')
             print(i, "open:%s, bid:%s, ask:%s,cost:%s"%(ticker['open'],ticker['bid'],ticker['ask'], time.time()-start))
-            r = self.liqui
+            r = self.y
             start = time.time()
             ticker = r.fetch_ticker('LTC/USD')
             print(i, "open:%s, bid:%s, ask:%s,cost:%s"%(ticker['open'],ticker['bid'],ticker['ask'], time.time()-start))
