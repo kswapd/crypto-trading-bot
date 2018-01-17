@@ -4,7 +4,10 @@ import pprint as pp
 import trade 
 import time
 import fetch_web
-atrade = trade.auto_trade()
-atrade.start()
+import fetch_info
+#atrade = trade.auto_trade()
+#atrade.start()
 #auto_fetch = fetch_web.fetch_url()
 #auto_fetch.start()
+coin_market = fetch_info.fetch_coinmarket()
+coin_market.start()
