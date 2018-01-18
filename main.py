@@ -1,4 +1,5 @@
 #! /usr/bin/python
+#-*-coding:utf-8-*- 
 import ccxt as ct
 import pprint as pp
 import trade 

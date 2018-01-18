@@ -17,7 +17,10 @@ class fetch_coinmarket:
 
     def start(self):
         print(self.coin_url)
+        #self.stdscr = curses.initscr()
         self.stdscr = curses.initscr()
+        self.stdscr = curses.newwin(600, 800, 0, 30)
+        #self.stdscr = curses.newpad(600, 800)
         curses.start_color()
         curses.init_pair(1, curses.COLOR_GREEN, curses.COLOR_BLACK)
         curses.init_pair(2, curses.COLOR_RED, curses.COLOR_BLACK)
