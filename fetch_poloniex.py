@@ -10,6 +10,7 @@ class fetch_poloniex:
     def __init__(self):
         self.is_stop = False
         self.num = 50
+        self.pos_y = 2
         self.target_symbol = ('USDT_BTC','USDT_LTC','USDT_BCH','USDT_ETH','USDT_XRP', 'USDT_DASH',  'BTC_DOGE')
         self.method = ('depth','ticker','trades', 'info')
         self.trade_list = ('ltc_usd', 'btc_usd', 'eth_usd', 'bcc_usd', 'dash_usd', 'doge_usd') 
@@ -38,7 +39,7 @@ class fetch_poloniex:
         print(ticker_url)
         #self.stdscr = curses.initscr()
         #self.stdscr = curses.initscr()
-        self.stdscr = curses.newwin(50, 80, 12, 0)
+        self.stdscr = curses.newwin(15, 80, 16, 0)
         #self.stdscr = curses.newpad(600, 800)
         curses.start_color()
         curses.init_pair(1, curses.COLOR_GREEN, curses.COLOR_BLACK)
@@ -46,7 +47,7 @@ class fetch_poloniex:
         curses.init_pair(3, curses.COLOR_YELLOW, curses.COLOR_BLACK)
 
         while not self.is_stop:
-            cur_pos_x = 0;
+            cur_pos_x = 2;
             myreq  = {}
             myreq['command'] = 'returnTicker' 
             myreq['nonce'] = int(time.time()*1000)
@@ -63,10 +64,13 @@ class fetch_poloniex:
             page = res.read()
             json_obj = json.loads(page)
             #print(page)
-            self.stdscr.addstr(cur_pos_x,0,'Poloniex\n'+time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()) ), curses.color_pair(3))
-            cur_pos_x += 2;
-            print_head =  "Symbol \t\tLast($) \tBuy \t\tSell \t\tPer"
-            self.stdscr.addstr(cur_pos_x,0,print_head,curses.color_pair(3))
+            self.stdscr.box(curses.ACS_VLINE, curses.ACS_HLINE)
+            self.stdscr.addstr(cur_pos_x,self.pos_y,'Poloniex', curses.color_pair(3))
+            cur_pos_x += 1;
+            self.stdscr.addstr(cur_pos_x,self.pos_y,time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()) ), curses.color_pair(3))
+            cur_pos_x += 1;
+            print_head =  "Symbol \tLast($) \tBuy \t\tSell \t\tPer"
+            self.stdscr.addstr(cur_pos_x,self.pos_y,print_head,curses.color_pair(3))
             cur_pos_x += 1;
             for pair in self.target_symbol:
                 color_index = 1
@@ -76,7 +80,7 @@ class fetch_poloniex:
                     print_content =  "%7s \t%7.2f \t%7.2f \t%7.2f \t%7.2f"%(pair, float(json_obj[pair]['last']), float(json_obj[pair]['highestBid']), float(json_obj[pair]['lowestAsk']), float(json_obj[pair]['percentChange']));
                     if json_obj[pair]['percentChange'][0] is '-':
                         color_index = 2
-                    self.stdscr.addstr(cur_pos_x,0,print_content,curses.color_pair(color_index))
+                    self.stdscr.addstr(cur_pos_x,self.pos_y,print_content,curses.color_pair(color_index))
                     cur_pos_x += 1
 
                 #print "hi:%d\r"%i
