@@ -1,12 +1,13 @@
 #! /usr/bin/python
 #-*-coding:utf-8-*- 
-import ccxt as ct
+#import ccxt as ct
 import pprint as pp
-import trade 
+#import trade 
 import time
 import fetch_web
 import fetch_coinmarket
 import fetch_yobit
+import fetch_poloniex
 import thread
 import curses
 #atrade = trade.auto_trade()
@@ -20,10 +21,14 @@ def start_coin_market(thrd_name, delay):
 def start_yobit(thrd_name,delay):
     info = fetch_yobit.fetch_yobit()
     info.get_ticker()
+def start_poloniex(thrd_name,delay):
+    info = fetch_poloniex.fetch_poloniex()
+    info.get_ticker()
 try:
     curses.initscr()
     td1 = thread.start_new_thread( start_coin_market,('55',2) )
     td2 = thread.start_new_thread( start_yobit,('5',2) )
+    td3 = thread.start_new_thread( start_poloniex,('6',2) )
 except KeyboardInterrupt as e:
     #coin_market.stop()
     print 'over'

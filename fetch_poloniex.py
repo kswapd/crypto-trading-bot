@@ -5,6 +5,7 @@ import json
 import sys, time
 import curses
 import hmac,hashlib
+import conf
 class fetch_poloniex:
     def __init__(self):
         self.is_stop = False
@@ -19,8 +20,12 @@ class fetch_poloniex:
  'User-Agent':'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:55.0) Gecko/20100101 Firefox/55.0',
 'Cookie':'__cfduid=d92eb21c1dd0e150a8e730ef1e8780fd61516264900; cf_clearance=b560c783af4fa00cb181eb572d0b30bc9e086b1c-1516264904-1800'
 } 
-        self.secret = '9a0718c859f5331663731566198f7ec802907c994935955493108fe26b40f1a0ffcbb8ec8aebc989c2dcb3249ead57a1025ca62d92c8ab78b4b877a953569194'
-        self.apikey = 'JDPP5LLW-JT0S02DE-PSQX7TX8-UXREDFLM'
+        keys_conf = conf.TradeKeys()
+        self.apikey = keys_conf.keys_info['poloniex']['public']
+        self.secret = keys_conf.keys_info['poloniex']['secret']
+	#print(self.secret)
+	#print(self.apikey)
+	
     def stop(self):
         self.is_stop = True
         curses.endwin()
@@ -31,7 +36,7 @@ class fetch_poloniex:
         print(ticker_url)
         #self.stdscr = curses.initscr()
         #self.stdscr = curses.initscr()
-        self.stdscr = curses.newwin(50, 70, 0, 0)
+        self.stdscr = curses.newwin(50, 80, 12, 0)
         #self.stdscr = curses.newpad(600, 800)
         curses.start_color()
         curses.init_pair(1, curses.COLOR_GREEN, curses.COLOR_BLACK)
@@ -58,16 +63,16 @@ class fetch_poloniex:
             #print(page)
             self.stdscr.addstr(cur_pos_x,0,'Poloniex\n'+time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()) ), curses.color_pair(3))
             cur_pos_x += 2;
-            print_head =  "Symbol \t\tLast($) \tBuy \t\tSell \t Per"
+            print_head =  "Symbol \t\tLast($) \tBuy \t\tSell \t\tPer"
             self.stdscr.addstr(cur_pos_x,0,print_head,curses.color_pair(3))
             cur_pos_x += 1;
             for pair in self.target_symbol:
-                color_index = 2
+                color_index = 1
 
                 if pair in self.target_symbol:
                     #print_content =  "sym:%7s \tprice:%10s \tper:%5s"%(json_obj[i]['symbol'], json_obj[i]['price_usd'], json_obj[i]['percent_change_24h']);
-                    print_content =  "%7s \t%7.2f \t%7.2f \t%7.2f, \t%7.2f"%(pair, float(json_obj[pair]['last']), float(json_obj[pair]['highestBid']), float(json_obj[pair]['lowestAsk']), float(json_obj[pair]['percentChange']));
-                    if True:
+                    print_content =  "%7s \t%7.2f \t%7.2f \t%7.2f \t%7.2f"%(pair, float(json_obj[pair]['last']), float(json_obj[pair]['highestBid']), float(json_obj[pair]['lowestAsk']), float(json_obj[pair]['percentChange']));
+                    if json_obj[pair]['percentChange'][0] is '-':
                         color_index = 2
                     self.stdscr.addstr(cur_pos_x,0,print_content,curses.color_pair(color_index))
                     cur_pos_x += 1
