@@ -48,12 +48,12 @@ class fetch_yobit:
             self.stdscr.addstr(cur_pos_x,0,print_head,curses.color_pair(3))
             cur_pos_x += 1;
             for pair in self.trade_list:
-                color_index = 2
+                color_index = 1
 
                 if pair in self.trade_list:
                     #print_content =  "sym:%7s \tprice:%10s \tper:%5s"%(json_obj[i]['symbol'], json_obj[i]['price_usd'], json_obj[i]['percent_change_24h']);
                     print_content =  "%7s \t%7.2f \t%7.2f \t%7.2f"%(pair, float(json_obj[pair]['last']), float(json_obj[pair]['buy']), float(json_obj[pair]['sell']));
-                    if True:
+                    if not True:
                         color_index = 2
                     self.stdscr.addstr(cur_pos_x,0,print_content,curses.color_pair(color_index))
                     cur_pos_x += 1
