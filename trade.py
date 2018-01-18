@@ -39,7 +39,7 @@ class auto_trade:
             all_info['k']['bid'] = ticker['bid']
 
 
-            r = self.liqui
+            r = self.y
             start = time.time()
             ticker = r.fetch_ticker(symbol)
             #print(i, "open:%s, bid:%s, ask:%s,cost:%s"%(ticker['open'],ticker['bid'],ticker['ask'], time.time()-start))
