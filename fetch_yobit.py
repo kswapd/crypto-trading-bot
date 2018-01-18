@@ -64,6 +64,7 @@ class fetch_yobit:
                 self.stdscr.refresh()
             time.sleep(2)
 if __name__ == "__main__":
+    curses.initscr()
     info = fetch_yobit()
     try:
         info.get_ticker()

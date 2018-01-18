@@ -54,6 +54,7 @@ class fetch_coinmarket:
                 self.stdscr.refresh()
             time.sleep(10)
 if __name__ == "__main__":
+    curses.initscr()
     coin_market = fetch_coinmarket()
     try:
         coin_market.start()
