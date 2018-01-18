@@ -10,7 +10,7 @@ class fetch_poloniex:
     def __init__(self):
         self.is_stop = False
         self.num = 50
-        self.target_symbol = ('USDT_BTC','USDT_ETH','USDT_XRP', 'USDT_BCH', 'USDT_LTC',  'USDT_DASH',  'BTC_DOGE')
+        self.target_symbol = ('USDT_BTC','USDT_LTC','USDT_BCH','USDT_ETH','USDT_XRP', 'USDT_DASH',  'BTC_DOGE')
         self.method = ('depth','ticker','trades', 'info')
         self.trade_list = ('ltc_usd', 'btc_usd', 'eth_usd', 'bcc_usd', 'dash_usd', 'doge_usd') 
         #self.coin_url = "https://api.coinmarketcap.com/v1/ticker/?limit=%d"%self.num
@@ -20,9 +20,11 @@ class fetch_poloniex:
  'User-Agent':'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:55.0) Gecko/20100101 Firefox/55.0',
 'Cookie':'__cfduid=d92eb21c1dd0e150a8e730ef1e8780fd61516264900; cf_clearance=b560c783af4fa00cb181eb572d0b30bc9e086b1c-1516264904-1800'
 } 
-        keys_conf = conf.TradeKeys()
-        self.apikey = keys_conf.keys_info['poloniex']['public']
-        self.secret = keys_conf.keys_info['poloniex']['secret']
+        #keys_conf = conf.TradeKeys()
+        #self.apikey = keys_conf.keys_info['poloniex']['public']
+        #self.secret = keys_conf.keys_info['poloniex']['secret']
+        self.apikey = 'aaa'
+        self.secret = 'bbb'
 	#print(self.secret)
 	#print(self.apikey)
 	

@@ -8,6 +8,7 @@ import fetch_web
 import fetch_coinmarket
 import fetch_yobit
 import fetch_poloniex
+import fetch_kraken
 import thread
 import curses
 #atrade = trade.auto_trade()
@@ -24,11 +25,19 @@ def start_yobit(thrd_name,delay):
 def start_poloniex(thrd_name,delay):
     info = fetch_poloniex.fetch_poloniex()
     info.get_ticker()
+def start_kraken(thrd_name,delay):
+    info = fetch_kraken.fetch_kraken()
+    info.get_ticker()
 try:
     curses.initscr()
     td1 = thread.start_new_thread( start_coin_market,('55',2) )
+    time.sleep(0.5)
     td2 = thread.start_new_thread( start_yobit,('5',2) )
+    time.sleep(0.5)
     td3 = thread.start_new_thread( start_poloniex,('6',2) )
+    time.sleep(0.5)
+    td4 = thread.start_new_thread( start_kraken('7',2) )
+    time.sleep(0.5)
 except KeyboardInterrupt as e:
     #coin_market.stop()
     print 'over'
