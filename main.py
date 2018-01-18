@@ -10,4 +10,7 @@ import fetch_info
 #auto_fetch = fetch_web.fetch_url()
 #auto_fetch.start()
 coin_market = fetch_info.fetch_coinmarket()
-coin_market.start()
+try:
+    coin_market.start()
+except KeyboardInterrupt as e:
+    coin_market.stop()
