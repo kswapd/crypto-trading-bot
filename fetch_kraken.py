@@ -4,6 +4,7 @@ import urllib2
 import json
 import sys, time
 import curses
+import logging
 class fetch_kraken:
     def __init__(self):
         self.is_stop = False
@@ -75,6 +76,7 @@ class fetch_kraken:
                         color_index = 2
                     self.stdscr.addstr(cur_pos_x,self.pos_y,print_content,curses.color_pair(color_index))
                     cur_pos_x += 1
+                    logging.info(print_content)
 
                 #print "hi:%d\r"%i
                 #stdscr.addstr(i, 0,  "hi:%d"%i)
