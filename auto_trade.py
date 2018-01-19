@@ -13,20 +13,33 @@ import thread
 import curses
 import monitor
 import logging
-#atrade = trade.auto_trade()
-#atrade.start()
-#auto_fetch = fetch_web.fetch_url()
-#auto_fetch.start()
+from logging.handlers import TimedRotatingFileHandler
+from logging.handlers import RotatingFileHandler
+import re
+
 p_info = {}
 k_info = {}
 global infok
 global infop
-logging.basicConfig(level=logging.DEBUG,
+def log_init():
+    '''
+    log_fmt = '%(asctime)s\tFile \"%(filename)s\",line %(lineno)s\t%(levelname)s: %(message)s'
+    formatter = logging.Formatter(log_fmt)
+    log_file_handler = TimedRotatingFileHandler(filename="monitor"+"thread_", when="D", interval=1, backupCount=7)
+    log_file_handler.suffix = "%Y-%m-%d_%H-%M.log"
+    log_file_handler.extMatch = re.compile(r"^\d{4}-\d{2}-\d{2}_\d{2}-\d{2}.log$")
+    log_file_handler.setFormatter(formatter)
+    log_file_handler.setLevel(logging.DEBUG)
+    log = logging.getLogger()
+    log.addHandler(log_file_handler)
+    '''
+    logging.basicConfig(level=logging.DEBUG,
                 format='%(asctime)s %(filename)s[line:%(lineno)d] %(levelname)s %(message)s',
                 datefmt='%a, %d %b %Y %H:%M:%S',
                 filename='monitor.log',
                 filemode='w')
     
+log_init()
 def start_coin_market(thrd_name, delay):
     coin_market = fetch_coinmarket.fetch_coinmarket()
     coin_market.start()

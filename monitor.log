@@ -1,40 +1,9 @@
-Fri, 19 Jan 2018 16:54:12 fetch_kraken.py[line:79] INFO XXBTZUSD 	11802.60 	11802.60 	11802.70
-Fri, 19 Jan 2018 16:54:12 fetch_kraken.py[line:79] INFO XLTCZUSD 	 197.86 	 197.85 	 198.87
-Fri, 19 Jan 2018 16:54:12 fetch_kraken.py[line:79] INFO  BCHUSD 	1852.10 	1849.60 	1853.60
-Fri, 19 Jan 2018 16:54:12 fetch_kraken.py[line:79] INFO XETHZUSD 	1069.44 	1064.02 	1068.96
-Fri, 19 Jan 2018 16:54:12 fetch_kraken.py[line:79] INFO XXRPZUSD 	   1.66 	   1.66 	   1.66
-Fri, 19 Jan 2018 16:54:13 auto_trade.py[line:88] INFO XRP 		  -1.00 	   1.66 	   2.66, 	-266.30
-Fri, 19 Jan 2018 16:54:15 auto_trade.py[line:88] INFO XRP 		  -1.00 	   1.66 	   2.66, 	-266.30
-Fri, 19 Jan 2018 16:54:15 fetch_kraken.py[line:79] INFO XXBTZUSD 	11802.60 	11802.60 	11802.70
-Fri, 19 Jan 2018 16:54:15 fetch_kraken.py[line:79] INFO XLTCZUSD 	 197.86 	 197.85 	 198.88
-Fri, 19 Jan 2018 16:54:15 fetch_kraken.py[line:79] INFO  BCHUSD 	1852.10 	1853.60 	1854.60
-Fri, 19 Jan 2018 16:54:15 fetch_kraken.py[line:79] INFO XETHZUSD 	1069.44 	1064.05 	1068.96
-Fri, 19 Jan 2018 16:54:15 fetch_kraken.py[line:79] INFO XXRPZUSD 	   1.66 	   1.66 	   1.66
-Fri, 19 Jan 2018 16:54:17 auto_trade.py[line:88] INFO XRP 		  -1.00 	   1.66 	   2.66, 	-266.30
-Fri, 19 Jan 2018 16:54:19 auto_trade.py[line:88] INFO XRP 		  -1.00 	   1.66 	   2.66, 	-266.30
-Fri, 19 Jan 2018 16:54:20 fetch_kraken.py[line:79] INFO XXBTZUSD 	11802.60 	11802.60 	11802.70
-Fri, 19 Jan 2018 16:54:20 fetch_kraken.py[line:79] INFO XLTCZUSD 	 197.85 	 197.85 	 198.60
-Fri, 19 Jan 2018 16:54:20 fetch_kraken.py[line:79] INFO  BCHUSD 	1853.60 	1853.60 	1854.50
-Fri, 19 Jan 2018 16:54:20 fetch_kraken.py[line:79] INFO XETHZUSD 	1069.44 	1064.06 	1068.96
-Fri, 19 Jan 2018 16:54:20 fetch_kraken.py[line:79] INFO XXRPZUSD 	   1.66 	   1.66 	   1.66
-Fri, 19 Jan 2018 16:54:21 auto_trade.py[line:88] INFO XRP 		  -1.00 	   1.66 	   2.66, 	-266.33
-Fri, 19 Jan 2018 16:54:23 auto_trade.py[line:88] INFO XRP 		  -1.00 	   1.66 	   2.66, 	-266.33
-Fri, 19 Jan 2018 16:54:25 fetch_kraken.py[line:79] INFO XXBTZUSD 	11802.60 	11802.60 	11802.70
-Fri, 19 Jan 2018 16:54:25 fetch_kraken.py[line:79] INFO XLTCZUSD 	 197.85 	 197.85 	 198.60
-Fri, 19 Jan 2018 16:54:25 fetch_kraken.py[line:79] INFO  BCHUSD 	1853.60 	1849.60 	1853.40
-Fri, 19 Jan 2018 16:54:25 fetch_kraken.py[line:79] INFO XETHZUSD 	1069.44 	1064.08 	1068.85
-Fri, 19 Jan 2018 16:54:25 fetch_kraken.py[line:79] INFO XXRPZUSD 	   1.66 	   1.66 	   1.66
-Fri, 19 Jan 2018 16:54:25 auto_trade.py[line:88] INFO XRP 		  -1.00 	   1.66 	   2.66, 	-266.33
-Fri, 19 Jan 2018 16:54:27 auto_trade.py[line:88] INFO XRP 		  -1.00 	   1.66 	   2.66, 	-266.33
-Fri, 19 Jan 2018 16:54:28 fetch_kraken.py[line:79] INFO XXBTZUSD 	11802.60 	11802.60 	11802.70
-Fri, 19 Jan 2018 16:54:28 fetch_kraken.py[line:79] INFO XLTCZUSD 	 197.85 	 197.85 	 198.87
-Fri, 19 Jan 2018 16:54:28 fetch_kraken.py[line:79] INFO  BCHUSD 	1853.60 	1849.60 	1852.60
-Fri, 19 Jan 2018 16:54:28 fetch_kraken.py[line:79] INFO XETHZUSD 	1069.44 	1064.06 	1064.08
-Fri, 19 Jan 2018 16:54:28 fetch_kraken.py[line:79] INFO XXRPZUSD 	   1.66 	   1.66 	   1.66
-Fri, 19 Jan 2018 16:54:29 auto_trade.py[line:88] INFO XRP 		  -1.00 	   1.66 	   2.66, 	-266.33
-Fri, 19 Jan 2018 16:54:31 auto_trade.py[line:88] INFO XRP 		  -1.00 	   1.66 	   2.66, 	-266.33
-Fri, 19 Jan 2018 16:54:31 fetch_kraken.py[line:79] INFO XXBTZUSD 	11802.60 	11802.60 	11802.70
-Fri, 19 Jan 2018 16:54:31 fetch_kraken.py[line:79] INFO XLTCZUSD 	 197.85 	 197.85 	 198.86
-Fri, 19 Jan 2018 16:54:31 fetch_kraken.py[line:79] INFO  BCHUSD 	1852.60 	1849.60 	1853.60
-Fri, 19 Jan 2018 16:54:31 fetch_kraken.py[line:79] INFO XETHZUSD 	1064.08 	1064.09 	1068.80
-Fri, 19 Jan 2018 16:54:31 fetch_kraken.py[line:79] INFO XXRPZUSD 	   1.66 	   1.66 	   1.67
+Fri, 19 Jan 2018 17:18:17 auto_trade.py[line:101] INFO XRP 		  -1.00 	  -1.00 	   0.00, 	   0.00
+Fri, 19 Jan 2018 17:18:18 fetch_kraken.py[line:79] INFO XXBTZUSD 	11780.00 	11771.00 	11780.00
+Fri, 19 Jan 2018 17:18:18 fetch_kraken.py[line:79] INFO XLTCZUSD 	 197.44 	 197.44 	 197.60
+Fri, 19 Jan 2018 17:18:18 fetch_kraken.py[line:79] INFO  BCHUSD 	1837.00 	1837.00 	1837.90
+Fri, 19 Jan 2018 17:18:18 fetch_kraken.py[line:79] INFO XETHZUSD 	1069.99 	1069.99 	1070.00
+Fri, 19 Jan 2018 17:18:18 fetch_kraken.py[line:79] INFO XXRPZUSD 	   1.67 	   1.67 	   1.67
+Fri, 19 Jan 2018 17:18:19 auto_trade.py[line:101] INFO XRP 		  -1.00 	   1.67 	   2.67, 	-266.80
+Fri, 19 Jan 2018 17:18:21 auto_trade.py[line:101] INFO XRP 		  -1.00 	   1.67 	   2.67, 	-266.80
+Fri, 19 Jan 2018 17:18:23 auto_trade.py[line:101] INFO XRP 		  -1.00 	   1.67 	   2.67, 	-266.80
