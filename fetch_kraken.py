@@ -20,6 +20,7 @@ class fetch_kraken:
  'Connection':'keep-alive'
 } 
         self.monitor_info = {
+                'time':time.time(),
                 'BTC':{'last':{'price':-1, 'num':-1}, 'bid':{'price':-1, 'num':-1}, 'ask':{'price':-1, 'num':-1}},
                 'LTC':{'last':{'price':-1, 'num':-1}, 'bid':{'price':-1, 'num':-1}, 'ask':{'price':-1, 'num':-1}},
                 'ETH':{'last':{'price':-1, 'num':-1}, 'bid':{'price':-1, 'num':-1}, 'ask':{'price':-1, 'num':-1}},
@@ -61,6 +62,7 @@ class fetch_kraken:
             cur_pos_x += 1;
             for pair in self.trade_list:
                 color_index = 1
+                self.monitor_info['time'] = time.time()
                 if self.symbol_info_pair.has_key(pair):
                     self.monitor_info[self.symbol_info_pair[pair]]['last']['price'] = float(json_obj[pair]['c'][0])
                     self.monitor_info[self.symbol_info_pair[pair]]['bid']['price'] = float(json_obj[pair]['b'][0])

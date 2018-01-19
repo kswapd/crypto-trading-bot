@@ -54,13 +54,18 @@ def start_monitor(thrd_name,delay):
         stdscr.box(curses.ACS_VLINE, curses.ACS_HLINE)
         stdscr.addstr(pos_x,pos_y,'Monitor', curses.color_pair(3))
         pos_x += 1
+        ptime =  time.strftime('%H:%M:%S', time.localtime(k_info['time']))
+        ktime =  time.strftime('%H:%M:%S', time.localtime(p_info['time']))
+        subtime = k_info['time'] - p_info['time']
         stdscr.addstr(pos_x,pos_y,time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()) ), curses.color_pair(3))
+        pos_x += 1
+        stdscr.addstr(pos_x, pos_y, 'P:'+ptime + '|K:' + ktime + '|Cur-P:%.2fs|K-P:%.2fs'%(time.time()-p_info['time'], subtime), curses.color_pair(3))
         pos_x += 1
         print_head =  "Symbol \tPoloniex($) \tKraken \t\tSub \t\tPercent(%)"
         stdscr.addstr(pos_x,pos_y,print_head,curses.color_pair(3))
         pos_x += 1
         cur = 'BTC'
-        stdscr.addstr(pos_x,pos_y,"BTC \t\t%7.2f \t%7.2f \t%7.2f, \t%7.2f"%(p_info[cur]['last']['price'], k_info[cur]['last']['price'],k_info[cur]['last']['price']-p_info[cur]['last']['price'], (k_info[cur]['last']['price']-p_info[cur]['last']['price'])*100/p_info[cur]['last']['price']),curses.color_pair(3))
+        stdscr.addstr(pos_x,pos_y,"BTC \t\t%7.2f \t%7.2f \t%7.2f, \t%7.2f "%(p_info[cur]['last']['price'], k_info[cur]['last']['price'],k_info[cur]['last']['price']-p_info[cur]['last']['price'], (k_info[cur]['last']['price']-p_info[cur]['last']['price'])*100/p_info[cur]['last']['price']),curses.color_pair(3))
         pos_x += 1
         cur = 'LTC'
         stdscr.addstr(pos_x,pos_y,"LTC \t\t%7.2f \t%7.2f \t%7.2f, \t%7.2f"%(p_info[cur]['last']['price'], k_info[cur]['last']['price'],k_info[cur]['last']['price']-p_info[cur]['last']['price'], (k_info[cur]['last']['price']-p_info[cur]['last']['price'])*100/p_info[cur]['last']['price']),curses.color_pair(3))

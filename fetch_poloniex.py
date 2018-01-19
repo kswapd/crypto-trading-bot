@@ -19,7 +19,7 @@ class fetch_poloniex:
         self.send_headers = {
  'Accept':'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
  'User-Agent':'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:55.0) Gecko/20100101 Firefox/55.0',
- 'Cookie':'__cfduid=d92eb21c1dd0e150a8e730ef1e8780fd61516264900; cf_clearance=6cfee2bba5c3195454b486744acb78e68f37e101-1516330664-1800'
+ 'Cookie':'__cfduid=d92eb21c1dd0e150a8e730ef1e8780fd61516264900; cf_clearance=339b799186e6dc562cc4969494251720d3ff68a3-1516348416-1800'
 } 
         #keys_conf = conf.TradeKeys()
         #self.apikey = keys_conf.keys_info['poloniex']['public']
@@ -29,6 +29,7 @@ class fetch_poloniex:
 	#print(self.secret)
 	#print(self.apikey)
         self.monitor_info = {
+                'time':time.time(),
                 'BTC':{'last':{'price':-1, 'num':-1}, 'bid':{'price':-1, 'num':-1}, 'ask':{'price':-1, 'num':-1}},
                 'LTC':{'last':{'price':-1, 'num':-1}, 'bid':{'price':-1, 'num':-1}, 'ask':{'price':-1, 'num':-1}},
                 'ETH':{'last':{'price':-1, 'num':-1}, 'bid':{'price':-1, 'num':-1}, 'ask':{'price':-1, 'num':-1}},
@@ -81,6 +82,7 @@ class fetch_poloniex:
             cur_pos_x += 1;
             for pair in self.target_symbol:
                 color_index = 1
+                self.monitor_info['time'] = time.time()
                 if self.symbol_info_pair.has_key(pair):
                     self.monitor_info[self.symbol_info_pair[pair]]['last']['price'] = float(json_obj[pair]['last'])
                     self.monitor_info[self.symbol_info_pair[pair]]['bid']['price'] = float(json_obj[pair]['highestBid'])
@@ -90,7 +92,7 @@ class fetch_poloniex:
                 if pair in self.target_symbol:
                     #print_content =  "sym:%7s \tprice:%10s \tper:%5s"%(json_obj[i]['symbol'], json_obj[i]['price_usd'], json_obj[i]['percent_change_24h']);
                     print_content =  "%7s \t%7.2f \t%7.2f \t%7.2f \t%7.2f"%(pair, float(json_obj[pair]['last']), float(json_obj[pair]['highestBid']), float(json_obj[pair]['lowestAsk']), float(json_obj[pair]['percentChange']));
-                    if json_obj[pair]['percentChange'][0] is '-':
+                    if json_obj[pair]['percentChange'][0] == "-":
                         color_index = 2
                     self.stdscr.addstr(cur_pos_x,self.pos_y,print_content,curses.color_pair(color_index))
                     cur_pos_x += 1
