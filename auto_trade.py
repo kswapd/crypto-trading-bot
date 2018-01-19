@@ -12,6 +12,7 @@ import fetch_kraken
 import thread
 import curses
 import monitor
+import logging
 #atrade = trade.auto_trade()
 #atrade.start()
 #auto_fetch = fetch_web.fetch_url()
@@ -20,6 +21,12 @@ p_info = {}
 k_info = {}
 global infok
 global infop
+logging.basicConfig(level=logging.DEBUG,
+                format='%(asctime)s %(filename)s[line:%(lineno)d] %(levelname)s %(message)s',
+                datefmt='%a, %d %b %Y %H:%M:%S',
+                filename='monitor.log',
+                filemode='w')
+    
 def start_coin_market(thrd_name, delay):
     coin_market = fetch_coinmarket.fetch_coinmarket()
     coin_market.start()
@@ -74,9 +81,11 @@ def start_monitor(thrd_name,delay):
         stdscr.addstr(pos_x,pos_y,"ETH \t\t%7.2f \t%7.2f \t%7.2f, \t%7.2f"%(p_info[cur]['last']['price'], k_info[cur]['last']['price'],k_info[cur]['last']['price']-p_info[cur]['last']['price'], (k_info[cur]['last']['price']-p_info[cur]['last']['price'])*100/p_info[cur]['last']['price']),curses.color_pair(3))
         pos_x += 1
         cur = 'XRP'
-        stdscr.addstr(pos_x,pos_y,"XRP \t\t%7.2f \t%7.2f \t%7.2f, \t%7.2f"%(p_info[cur]['last']['price'], k_info[cur]['last']['price'],k_info[cur]['last']['price']-p_info[cur]['last']['price'], (k_info[cur]['last']['price']-p_info[cur]['last']['price'])*100/p_info[cur]['last']['price']),curses.color_pair(3))
+        prt_str = "XRP \t\t%7.2f \t%7.2f \t%7.2f, \t%7.2f"%(p_info[cur]['last']['price'], k_info[cur]['last']['price'],k_info[cur]['last']['price']-p_info[cur]['last']['price'], (k_info[cur]['last']['price']-p_info[cur]['last']['price'])*100/p_info[cur]['last']['price'])
+        stdscr.addstr(pos_x,pos_y,prt_str,curses.color_pair(3))
         pos_x += 1
         stdscr.refresh()
+	logging.info(prt_str)
         time.sleep(2)
 
 try:
