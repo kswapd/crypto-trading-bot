@@ -19,7 +19,7 @@ class fetch_poloniex:
         self.send_headers = {
  'Accept':'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
  'User-Agent':'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:55.0) Gecko/20100101 Firefox/55.0',
-'Cookie':'__cfduid=d92eb21c1dd0e150a8e730ef1e8780fd61516264900; cf_clearance=b560c783af4fa00cb181eb572d0b30bc9e086b1c-1516264904-1800'
+ 'Cookie':'__cfduid=d92eb21c1dd0e150a8e730ef1e8780fd61516264900; cf_clearance=3d40fc1879771c1843db0cbb95297349a246f0f5-1516324873-1800'
 } 
         #keys_conf = conf.TradeKeys()
         #self.apikey = keys_conf.keys_info['poloniex']['public']

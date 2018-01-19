@@ -34,11 +34,11 @@ class fetch_coinmarket:
             page = res.read()
             json_obj = json.loads(page)
             self.stdscr.box(curses.ACS_VLINE, curses.ACS_HLINE)
-            self.stdscr.addstr(cur_pos_x,self.pos_y,'Coin market', curses.color_pair(3))
+            self.stdscr.addstr(cur_pos_x,self.pos_y,'Coin market cap', curses.color_pair(3))
             cur_pos_x += 1;
             self.stdscr.addstr(cur_pos_x,self.pos_y,time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()) ), curses.color_pair(3))
             cur_pos_x += 1;
-            print_head =  "Symbol \t\tPrice($) \tPercent(24h)"
+            print_head =  "Symbol \tPrice($) \tPercent(24h)"
             self.stdscr.addstr(cur_pos_x,self.pos_y,print_head,curses.color_pair(3))
             cur_pos_x += 1;
             for i in range(self.num):

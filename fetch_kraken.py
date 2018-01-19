@@ -49,7 +49,7 @@ class fetch_kraken:
             cur_pos_x += 1;
             self.stdscr.addstr(cur_pos_x,self.pos_y,time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()) ), curses.color_pair(3))
             cur_pos_x += 1;
-            print_head =  "Symbol \t\tLast($) \tBuy \t\tSell"
+            print_head =  "Symbol \tLast($) \tBuy \t\tSell"
             self.stdscr.addstr(cur_pos_x,self.pos_y,print_head,curses.color_pair(3))
             cur_pos_x += 1;
             for pair in self.trade_list:
