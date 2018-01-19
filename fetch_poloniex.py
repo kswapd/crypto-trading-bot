@@ -19,7 +19,7 @@ class fetch_poloniex:
         self.send_headers = {
  'Accept':'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
  'User-Agent':'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:55.0) Gecko/20100101 Firefox/55.0',
- 'Cookie':'__cfduid=d92eb21c1dd0e150a8e730ef1e8780fd61516264900; cf_clearance=3d40fc1879771c1843db0cbb95297349a246f0f5-1516324873-1800'
+ 'Cookie':'__cfduid=d92eb21c1dd0e150a8e730ef1e8780fd61516264900; cf_clearance=6cfee2bba5c3195454b486744acb78e68f37e101-1516330664-1800'
 } 
         #keys_conf = conf.TradeKeys()
         #self.apikey = keys_conf.keys_info['poloniex']['public']
@@ -28,6 +28,13 @@ class fetch_poloniex:
         self.secret = 'bbb'
 	#print(self.secret)
 	#print(self.apikey)
+        self.monitor_info = {
+                'BTC':{'last':{'price':-1, 'num':-1}, 'bid':{'price':-1, 'num':-1}, 'ask':{'price':-1, 'num':-1}},
+                'LTC':{'last':{'price':-1, 'num':-1}, 'bid':{'price':-1, 'num':-1}, 'ask':{'price':-1, 'num':-1}},
+                'ETH':{'last':{'price':-1, 'num':-1}, 'bid':{'price':-1, 'num':-1}, 'ask':{'price':-1, 'num':-1}},
+                'XRP':{'last':{'price':-1, 'num':-1}, 'bid':{'price':-1, 'num':-1}, 'ask':{'price':-1, 'num':-1}}
+            }
+        self.symbol_info_pair = {'USDT_BTC':'BTC','USDT_LTC':'LTC','USDT_ETH':'ETH','USDT_XRP':'XRP'}
 	
     def stop(self):
         self.is_stop = True
@@ -74,6 +81,11 @@ class fetch_poloniex:
             cur_pos_x += 1;
             for pair in self.target_symbol:
                 color_index = 1
+                if self.symbol_info_pair.has_key(pair):
+                    self.monitor_info[self.symbol_info_pair[pair]]['last']['price'] = float(json_obj[pair]['last'])
+                    self.monitor_info[self.symbol_info_pair[pair]]['bid']['price'] = float(json_obj[pair]['highestBid'])
+                    self.monitor_info[self.symbol_info_pair[pair]]['ask']['price'] = float(json_obj[pair]['lowestAsk'])
+
 
                 if pair in self.target_symbol:
                     #print_content =  "sym:%7s \tprice:%10s \tper:%5s"%(json_obj[i]['symbol'], json_obj[i]['price_usd'], json_obj[i]['percent_change_24h']);
