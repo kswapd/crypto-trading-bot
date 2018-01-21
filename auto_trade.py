@@ -79,7 +79,8 @@ def start_monitor(thrd_name,delay):
         subtime = k_info['time'] - p_info['time']
         stdscr.addstr(pos_x,pos_y,time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()) ), curses.color_pair(3))
         pos_x += 1
-        stdscr.addstr(pos_x, pos_y, 'P:'+ptime + '|K:' + ktime + '|Cur-P:%.2fs|K-P:%.2fs'%(time.time()-p_info['time'], subtime), curses.color_pair(3))
+        time_comp = '|Cur-P:%.2fs|K-P:%.2fs'%(time.time()-p_info['time'], subtime)
+        stdscr.addstr(pos_x, pos_y, 'P:'+ptime + '|K:' + ktime + time_comp, curses.color_pair(3))
         pos_x += 1
         print_head =  "Symbol \tPoloniex($) \tKraken \t\tSub \t\tPercent(%)"
         stdscr.addstr(pos_x,pos_y,print_head,curses.color_pair(3))
@@ -98,7 +99,7 @@ def start_monitor(thrd_name,delay):
         stdscr.addstr(pos_x,pos_y,prt_str,curses.color_pair(3))
         pos_x += 1
         stdscr.refresh()
-	logging.info(prt_str)
+	logging.info(prt_str+time_comp)
         time.sleep(2)
 
 try:
