@@ -71,7 +71,14 @@ class fetch_yobit(cv.console_view):
             cur_pos_x += 1;
             self.stdscr.addstr(cur_pos_x,self.pos_y,time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()) ), curses.color_pair(3))
             cur_pos_x += 1;
-            print_head =  "Symbol \tLast($) \tBuy \t\tSell"
+            #print_head =  "Symbol \tLast($) \tBuy \t\tSell"
+
+            if self.view_mode == 'simp':
+                print_head =  "Symbol \tLast($)"
+            elif self.view_mode == 'complete':
+                print_head =  "Symbol \tLast($) \tBuy \t\tSell \t\tPer"
+            
+
             self.stdscr.addstr(cur_pos_x,self.pos_y,print_head,curses.color_pair(3))
             cur_pos_x += 1;
             for pair in self.trade_list:
@@ -86,7 +93,10 @@ class fetch_yobit(cv.console_view):
 
                 if pair in self.trade_list:
                     #print_content =  "sym:%7s \tprice:%10s \tper:%5s"%(json_obj[i]['symbol'], json_obj[i]['price_usd'], json_obj[i]['percent_change_24h']);
-                    print_content =  "%7s \t%7.2f \t%7.2f \t%7.2f"%(pair, float(json_obj[pair]['last']), float(json_obj[pair]['buy']), float(json_obj[pair]['sell']));
+                    if self.view_mode == 'simp':
+                        print_content =  "%7s \t%7.2f"%(pair, float(json_obj[pair]['last']));
+                    elif self.view_mode == 'complete':   
+                        print_content =  "%7s \t%7.2f \t%7.2f \t%7.2f"%(pair, float(json_obj[pair]['last']), float(json_obj[pair]['buy']), float(json_obj[pair]['sell']));
                     if not True:
                         color_index = 2
                     self.stdscr.addstr(cur_pos_x,self.pos_y,print_content,curses.color_pair(color_index))

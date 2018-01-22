@@ -45,15 +45,15 @@ class auto_trade(cv.console_view):
         coin_market = fetch_coinmarket.fetch_coinmarket()
         coin_market.start()
     def start_yobit(self, thrd_name,delay):
-        self.yobit = fetch_yobit.fetch_yobit(0, 16, 60, 15)
+        self.yobit = fetch_yobit.fetch_yobit(90, 16, 45, 15)
         self.y_info = self.yobit.monitor_info
         self.yobit.get_ticker()
     def start_poloniex(self, thrd_name,delay):
-        self.poloniex = fetch_poloniex.fetch_poloniex()
+        self.poloniex = fetch_poloniex.fetch_poloniex(0,16,45,15)
         self.p_info = self.poloniex.monitor_info
         self.poloniex.get_ticker()
     def start_kraken(self, thrd_name,delay):
-        self.kraken = fetch_kraken.fetch_kraken()
+        self.kraken = fetch_kraken.fetch_kraken(45,16,45,15)
         self.k_info = self.kraken.monitor_info
         self.kraken.get_ticker()
     def start_monitor(self, thrd_name,delay):
