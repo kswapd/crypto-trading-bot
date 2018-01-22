@@ -21,7 +21,7 @@ class fetch_poloniex(cv.console_view):
         self.send_headers = {
  'Accept':'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
  'User-Agent':'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:55.0) Gecko/20100101 Firefox/55.0',
- 'Cookie':'__cfduid=d92eb21c1dd0e150a8e730ef1e8780fd61516264900; cf_clearance=672c6892e24c60ee193334f36cae91b77957949b-1516610967-1800'
+ 'Cookie':'__cfduid=d92eb21c1dd0e150a8e730ef1e8780fd61516264900; cf_clearance=e61fba35a2c2bdc9cd35af99cb5ca9112244f353-1516613184-1800'
 } 
         #keys_conf = conf.TradeKeys()
         #self.apikey = keys_conf.keys_info['poloniex']['public']
