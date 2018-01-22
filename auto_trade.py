@@ -123,6 +123,8 @@ class auto_trade(cv.console_view):
             for coin in all_coin:
                 cur = coin
                 prt_str = coin + " \t\t%7.2f \t%7.2f \t%7.2f, \t%7.2f, \t%7.2f \t%7.2f, \t%7.2f"%(self.p_info[cur]['last']['price'], self.k_info[cur]['last']['price'],self.k_info[cur]['last']['price']-self.p_info[cur]['last']['price'], (self.k_info[cur]['last']['price']-self.p_info[cur]['last']['price'])*100/self.p_info[cur]['last']['price'], self.y_info[cur]['last']['price'],self.y_info[cur]['last']['price']-self.p_info[cur]['last']['price'], (self.y_info[cur]['last']['price']-self.p_info[cur]['last']['price'])*100/self.p_info[cur]['last']['price'])
+                
+                prt_str =  re.sub(r'(-[\d+\.\d]+)','--', prt_str)   
                 stdscr.addstr(pos_x,pos_y,prt_str,curses.color_pair(3))
                 pos_x += 1
 
