@@ -4,8 +4,10 @@ import urllib2
 import json
 import sys, time
 import curses
-class fetch_coinmarket:
-    def __init__(self):
+import console_view as cv
+class fetch_coinmarket(cv.console_view):
+    def __init__(self, x = 0, y = 0, width = 80, height = 15, is_view = True):
+        cv.console_view.__init__(self, x, y, width, height, is_view)
         self.is_stop = False
         self.num = 50
         self.pos_y = 2 
@@ -20,7 +22,9 @@ class fetch_coinmarket:
         print(self.coin_url)
         #self.stdscr = curses.initscr()
         #self.stdscr = curses.initscr()
-        self.stdscr = curses.newwin(15, 80, 0, 0)
+        #self.stdscr = curses.newwin(15, 80, 0, 0)
+        self.stdscr = curses.newwin(self.display_pos['height'], self.display_pos['width'], self.display_pos['y'], self.display_pos['x'])
+
         #self.stdscr = curses.newpad(600, 800)
         curses.start_color()
         curses.init_pair(1, curses.COLOR_GREEN, curses.COLOR_BLACK)

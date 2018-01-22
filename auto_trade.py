@@ -16,9 +16,10 @@ import logging
 from logging.handlers import TimedRotatingFileHandler
 from logging.handlers import RotatingFileHandler
 import re
-
-class auto_trade:
-    def __init__(self):
+import console_view as cv
+class auto_trade(cv.console_view):
+    def __init__(self, x = 0, y = 0, width = 140, height = 15, is_view = True):
+        cv.console_view.__init__(self, x, y, width, height, is_view)
         self.p_info = {}
         self.k_info = {}
         self.log_init()
@@ -44,8 +45,9 @@ class auto_trade:
         coin_market = fetch_coinmarket.fetch_coinmarket()
         coin_market.start()
     def start_yobit(self, thrd_name,delay):
-        info = fetch_yobit.fetch_yobit()
-        info.get_ticker()
+        self.yobit = fetch_yobit.fetch_yobit(0, 16, 60, 15)
+        self.y_info = self.yobit.monitor_info
+        self.yobit.get_ticker()
     def start_poloniex(self, thrd_name,delay):
         self.poloniex = fetch_poloniex.fetch_poloniex()
         self.p_info = self.poloniex.monitor_info
@@ -56,7 +58,9 @@ class auto_trade:
         self.kraken.get_ticker()
     def start_monitor(self, thrd_name,delay):
         time.sleep(2)
-        stdscr = curses.newwin(15, 80, 0, 0)
+        #stdscr = curses.newwin(15, 140, 0, 0)
+        stdscr = curses.newwin(self.display_pos['height'], self.display_pos['width'], self.display_pos['y'], self.display_pos['x'])
+
         curses.start_color()
         curses.init_pair(1, curses.COLOR_GREEN, curses.COLOR_BLACK)
         curses.init_pair(2, curses.COLOR_RED, curses.COLOR_BLACK)
@@ -64,6 +68,7 @@ class auto_trade:
         while True:
             self.p_info = self.poloniex.monitor_info
             self.k_info = self.kraken.monitor_info
+            self.y_info = self.yobit.monitor_info
             pos_x = 2
             pos_y = 2
             stdscr.box(curses.ACS_VLINE, curses.ACS_HLINE)
@@ -71,15 +76,20 @@ class auto_trade:
             pos_x += 1
             ptime =  time.strftime('%H:%M:%S', time.localtime(self.k_info['time']))
             ktime =  time.strftime('%H:%M:%S', time.localtime(self.p_info['time']))
+            ytime =  time.strftime('%H:%M:%S', time.localtime(self.y_info['time']))
             subtime = self.k_info['time'] - self.p_info['time']
+            suby_ptime = self.y_info['time'] - self.p_info['time']
             stdscr.addstr(pos_x,pos_y,time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()) ), curses.color_pair(3))
             pos_x += 1
-            time_comp = '|Cur-P:%.2fs|K-P:%.2fs'%(time.time()-self.p_info['time'], subtime)
-            stdscr.addstr(pos_x, pos_y, 'P:'+ptime + '|K:' + ktime + time_comp, curses.color_pair(3))
+            time_comp = '|Cur-P:%.2fs|K-P:%.2fs|Y-P:%.2f'%(time.time()-self.p_info['time'], subtime, suby_ptime)
+            stdscr.addstr(pos_x, pos_y, 'P:'+ptime + '|K:' + ktime + '|Y:'+ytime+ time_comp, curses.color_pair(3))
             pos_x += 1
-            print_head =  "Symbol \tPoloniex($) \tKraken \t\tSub \t\tPercent(%)"
+            print_head =  "Symbol \tPoloniex($) \tKraken \t\tSub(K-P) \tPercent(K-P) \tYobit\t\tSub(Y-P) \tPercent(Y-P)"
             stdscr.addstr(pos_x,pos_y,print_head,curses.color_pair(3))
             pos_x += 1
+
+
+            '''
             cur = 'BTC'
             stdscr.addstr(pos_x,pos_y,"BTC \t\t%7.2f \t%7.2f \t%7.2f, \t%7.2f "%(self.p_info[cur]['last']['price'], self.k_info[cur]['last']['price'],self.k_info[cur]['last']['price']-self.p_info[cur]['last']['price'], (self.k_info[cur]['last']['price']-self.p_info[cur]['last']['price'])*100/self.p_info[cur]['last']['price']),curses.color_pair(3))
             pos_x += 1
@@ -93,6 +103,31 @@ class auto_trade:
             prt_str = "XRP \t\t%7.2f \t%7.2f \t%7.2f, \t%7.2f"%(self.p_info[cur]['last']['price'], self.k_info[cur]['last']['price'],self.k_info[cur]['last']['price']-self.p_info[cur]['last']['price'], (self.k_info[cur]['last']['price']-self.p_info[cur]['last']['price'])*100/self.p_info[cur]['last']['price'])
             stdscr.addstr(pos_x,pos_y,prt_str,curses.color_pair(3))
             pos_x += 1
+
+
+
+            cur = 'DASH'
+            prt_str = "DASH \t\t%7.2f \t%7.2f \t%7.2f, \t%7.2f"%(self.p_info[cur]['last']['price'], self.k_info[cur]['last']['price'],self.k_info[cur]['last']['price']-self.p_info[cur]['last']['price'], (self.k_info[cur]['last']['price']-self.p_info[cur]['last']['price'])*100/self.p_info[cur]['last']['price'])
+            stdscr.addstr(pos_x,pos_y,prt_str,curses.color_pair(3))
+            pos_x += 1
+            
+
+            cur = 'DOGE'
+            prt_str = "DOGE \t\t%7.2f \t%7.2f \t%7.2f, \t%7.2f"%(self.p_info[cur]['last']['price'], self.k_info[cur]['last']['price'],self.k_info[cur]['last']['price']-self.p_info[cur]['last']['price'], (self.k_info[cur]['last']['price']-self.p_info[cur]['last']['price'])*100/self.p_info[cur]['last']['price'])
+            stdscr.addstr(pos_x,pos_y,prt_str,curses.color_pair(3))
+            pos_x += 1
+            '''
+
+
+            all_coin = ('BTC', 'LTC', 'ETH', 'XRP', 'DASH', 'DOGE')
+            for coin in all_coin:
+                cur = coin
+                prt_str = coin + " \t\t%7.2f \t%7.2f \t%7.2f, \t%7.2f, \t%7.2f \t%7.2f, \t%7.2f"%(self.p_info[cur]['last']['price'], self.k_info[cur]['last']['price'],self.k_info[cur]['last']['price']-self.p_info[cur]['last']['price'], (self.k_info[cur]['last']['price']-self.p_info[cur]['last']['price'])*100/self.p_info[cur]['last']['price'], self.y_info[cur]['last']['price'],self.y_info[cur]['last']['price']-self.p_info[cur]['last']['price'], (self.y_info[cur]['last']['price']-self.p_info[cur]['last']['price'])*100/self.p_info[cur]['last']['price'])
+                stdscr.addstr(pos_x,pos_y,prt_str,curses.color_pair(3))
+                pos_x += 1
+
+
+
             stdscr.refresh()
     	    logging.info(prt_str+time_comp)
             time.sleep(2)
@@ -101,7 +136,7 @@ class auto_trade:
         try:
             curses.initscr()
             #td1 = thread.start_new_thread( start_coin_market,('55',2) )
-            #td2 = thread.start_new_thread( start_yobit,('5',2) )
+            td2 = thread.start_new_thread( self.start_yobit,('5',2) )
             td3 = thread.start_new_thread( self.start_poloniex,('6',2) )
             td4 = thread.start_new_thread( self.start_kraken,('7',2) )
             td5 = thread.start_new_thread( self.start_monitor,('8',2) )

@@ -5,14 +5,16 @@ import json
 import sys, time
 import curses
 import logging
-class fetch_kraken:
-    def __init__(self):
+import console_view as cv
+class fetch_kraken(cv.console_view):
+    def __init__(self, x = 80, y = 16, width = 80, height = 15, is_view = True):
+        cv.console_view.__init__(self, x, y, width, height, is_view)
         self.is_stop = False
         self.num = 50
         self.pos_y = 2
         self.target_symbol = ('BTC','ETH','XRP', 'BCH', 'LTC',  'DASH', 'USDT', 'DOGE')
         self.method = ('depth','ticker','trades', 'info')
-        self.trade_list = ('XXBTZUSD', 'XLTCZUSD', 'BCHUSD', 'XETHZUSD', 'XXRPZUSD') 
+        self.trade_list = ('XXBTZUSD', 'XLTCZUSD', 'BCHUSD', 'XETHZUSD', 'XXRPZUSD','DASHUSD') 
         #self.coin_url = "https://api.coinmarketcap.com/v1/ticker/?limit=%d"%self.num
 	self.base_url = 'https://api.kraken.com/0/public/Ticker?pair='
         self.send_headers = {
@@ -25,9 +27,11 @@ class fetch_kraken:
                 'BTC':{'last':{'price':-1, 'num':-1}, 'bid':{'price':-1, 'num':-1}, 'ask':{'price':-1, 'num':-1}},
                 'LTC':{'last':{'price':-1, 'num':-1}, 'bid':{'price':-1, 'num':-1}, 'ask':{'price':-1, 'num':-1}},
                 'ETH':{'last':{'price':-1, 'num':-1}, 'bid':{'price':-1, 'num':-1}, 'ask':{'price':-1, 'num':-1}},
-                'XRP':{'last':{'price':-1, 'num':-1}, 'bid':{'price':-1, 'num':-1}, 'ask':{'price':-1, 'num':-1}}
+                'XRP':{'last':{'price':-1, 'num':-1}, 'bid':{'price':-1, 'num':-1}, 'ask':{'price':-1, 'num':-1}},
+                'DASH':{'last':{'price':-1, 'num':-1}, 'bid':{'price':-1, 'num':-1}, 'ask':{'price':-1, 'num':-1}},
+                'DOGE':{'last':{'price':-1, 'num':-1}, 'bid':{'price':-1, 'num':-1}, 'ask':{'price':-1, 'num':-1}}
             }
-        self.symbol_info_pair = {'XXBTZUSD':'BTC','XLTCZUSD':'LTC','XETHZUSD':'ETH','XXRPZUSD':'XRP'}
+        self.symbol_info_pair = {'XXBTZUSD':'BTC','XLTCZUSD':'LTC','XETHZUSD':'ETH','XXRPZUSD':'XRP', 'DASHUSD':'DASH'}
     def stop(self):
         self.is_stop = True
         curses.endwin()
@@ -38,7 +42,9 @@ class fetch_kraken:
         print(ticker_url)
         #self.stdscr = curses.initscr()
         #self.stdscr = curses.initscr()
-        self.stdscr = curses.newwin(15, 80, 16, 80)
+        #self.stdscr = curses.newwin(15, 80, 16, 80)
+        self.stdscr = curses.newwin(self.display_pos['height'], self.display_pos['width'], self.display_pos['y'], self.display_pos['x'])
+
         #self.stdscr = curses.newpad(600, 800)
         curses.start_color()
         curses.init_pair(1, curses.COLOR_GREEN, curses.COLOR_BLACK)
