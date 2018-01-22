@@ -19,7 +19,7 @@ class fetch_poloniex:
         self.send_headers = {
  'Accept':'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
  'User-Agent':'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:55.0) Gecko/20100101 Firefox/55.0',
- 'Cookie':'__cfduid=d92eb21c1dd0e150a8e730ef1e8780fd61516264900; cf_clearance=339b799186e6dc562cc4969494251720d3ff68a3-1516348416-1800'
+ 'Cookie':'__cfduid=d92eb21c1dd0e150a8e730ef1e8780fd61516264900; cf_clearance=f8ce24c0c760f98aae65c69aedeaef97a1492f76-1516590058-1800'
 } 
         #keys_conf = conf.TradeKeys()
         #self.apikey = keys_conf.keys_info['poloniex']['public']
@@ -68,9 +68,16 @@ class fetch_poloniex:
             #    'Key': self.apikey
             #}
             req = urllib2.Request(ticker_url, headers=self.send_headers)
-            res = urllib2.urlopen(req)
-            page = res.read()
-            json_obj = json.loads(page)
+            try:
+                res = urllib2.urlopen(req,timeout=5)
+                page = res.read()
+                json_obj = json.loads(page)
+            except Exception,e:
+                err = 'Get poloniex data error, please set right cookies'
+                self.stdscr.addstr(cur_pos_x,self.pos_y,err,curses.color_pair(3))
+                self.stdscr.refresh()
+                time.sleep(2)
+                continue
             #print(page)
             self.stdscr.box(curses.ACS_VLINE, curses.ACS_HLINE)
             self.stdscr.addstr(cur_pos_x,self.pos_y,'Poloniex', curses.color_pair(3))

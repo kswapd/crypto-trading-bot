@@ -48,10 +48,17 @@ class fetch_kraken:
         while not self.is_stop:
             cur_pos_x = 2;
             req = urllib2.Request(ticker_url, headers=self.send_headers)
-            res = urllib2.urlopen(req)
-            page = res.read()
-            json_obj_all = json.loads(page)
-            json_obj = json_obj_all['result']
+            try:
+                res = urllib2.urlopen(req,timeout=5)
+                page = res.read()
+                json_obj_all = json.loads(page)
+                json_obj = json_obj_all['result']
+            except Exception,e:
+                err = 'Get kraken data error, please set right cookies'
+                self.stdscr.addstr(cur_pos_x,self.pos_y,err,curses.color_pair(3))
+                self.stdscr.refresh()
+                time.sleep(2)
+                continue
             #print(page)
             self.stdscr.box(curses.ACS_VLINE, curses.ACS_HLINE)
             self.stdscr.addstr(cur_pos_x,self.pos_y,'Kraken', curses.color_pair(3))
