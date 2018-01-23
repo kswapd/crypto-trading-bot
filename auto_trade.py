@@ -52,7 +52,9 @@ class auto_trade(cv.console_view):
 
     def start_binance(self, thrd_name,delay):
         self.binance = fetch_binance.fetch_binance(90, 16, 45, 15)
-        self.binance_info = self.binance.monitor_info
+        #self.binance_info = self.binance.monitor_info
+        self.y_info = self.binance.monitor_info
+        self.binance.get_ticker()
 
     def start_poloniex(self, thrd_name,delay):
         self.poloniex = fetch_poloniex.fetch_poloniex(0,16,45,15)
