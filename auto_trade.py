@@ -132,9 +132,18 @@ class auto_trade(cv.console_view):
             all_coin = ('BTC', 'LTC', 'ETH', 'XRP', 'DASH', 'DOGE')
             for coin in all_coin:
                 cur = coin
-                prt_str = coin + " \t\t%7.2f \t%7.2f \t%7.2f \t%7.2f \t%7.2f \t%7.2f \t%7.2f"%(self.p_info[cur]['last']['price'], self.k_info[cur]['last']['price'],self.k_info[cur]['last']['price']-self.p_info[cur]['last']['price'], (self.k_info[cur]['last']['price']-self.p_info[cur]['last']['price'])*100/self.p_info[cur]['last']['price'], self.y_info[cur]['last']['price'],self.y_info[cur]['last']['price']-self.p_info[cur]['last']['price'], (self.y_info[cur]['last']['price']-self.p_info[cur]['last']['price'])*100/self.p_info[cur]['last']['price'])
+                #prt_str = coin + " \t\t%7.2f \t%7.2f \t%7.2f \t%7.2f \t%7.2f \t%7.2f \t%7.2f"%(self.p_info[cur]['last']['price'], self.k_info[cur]['last']['price'],self.k_info[cur]['last']['price']-self.p_info[cur]['last']['price'], (self.k_info[cur]['last']['price']-self.p_info[cur]['last']['price'])*100/self.p_info[cur]['last']['price'], self.y_info[cur]['last']['price'],self.y_info[cur]['last']['price']-self.p_info[cur]['last']['price'], (self.y_info[cur]['last']['price']-self.p_info[cur]['last']['price'])*100/self.p_info[cur]['last']['price'])
                 
-                prt_str =  re.sub(r'(-[\d+\.\d]+)','--\t', prt_str)   
+ 		percent1 = (self.k_info[cur]['last']['price']-self.p_info[cur]['last']['price'])*100/self.p_info[cur]['last']['price']
+                if percent1 < -100 or percent1 > 100:
+                    percent1 = -1.00
+                percent2 =  (self.y_info[cur]['last']['price']-self.p_info[cur]['last']['price'])*100/self.p_info[cur]['last']['price']
+                if percent2 < -100 or percent2 > 100:
+                    percent2 = -1.00
+                prt_str = coin + " \t\t%7.2f \t%7.2f \t%7.2f \t%7.2f \t%7.2f \t%7.2f \t%7.2f"%(self.p_info[cur]['last']['price'], self.k_info[cur]['last']['price'],self.k_info[cur]['last']['price']-self.p_info[cur]['last']['price'], percent1, self.y_info[cur]['last']['price'],self.y_info[cur]['last']['price']-self.p_info[cur]['last']['price'],percent2)
+                
+                #prt_str =  re.sub(r'(-[\d+\.\d]+)','--\t', prt_str)   
+                prt_str =  re.sub(r'(-1.00)','--\t', prt_str)   
                 stdscr.addstr(pos_x,pos_y,prt_str,curses.color_pair(3))
                 pos_x += 1
 

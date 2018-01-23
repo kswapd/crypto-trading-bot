@@ -32,7 +32,7 @@ class fetch_binance(cv.console_view):
                 'DASH':{'last':{'price':-1, 'num':-1}, 'bid':{'price':-1, 'num':-1}, 'ask':{'price':-1, 'num':-1}},
                 'DOGE':{'last':{'price':-1, 'num':-1}, 'bid':{'price':-1, 'num':-1}, 'ask':{'price':-1, 'num':-1}}
             }
-        self.symbol_info_pair = {'BTCUSDT':'BTC','LTCUDT':'LTC','ETHUSDT':'ETH','XRPUSDT':'XRP', 'DASHUSDT':'DASH'}
+        self.symbol_info_pair = {'BTCUSDT':'BTC','LTCUSDT':'LTC','ETHUSDT':'ETH','XRPUSDT':'XRP', 'DASHUSDT':'DASH'}
     def stop(self):
         self.is_stop = True
         curses.endwin()
