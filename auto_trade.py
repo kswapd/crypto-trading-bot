@@ -97,39 +97,8 @@ class auto_trade(cv.console_view):
             print_head =  "Symbol \tPoloniex($) \tKraken \t\tSub(K-P) \tPercent(K-P) \tYobit\t\tSub(Y-P) \tPercent(Y-P)"
             stdscr.addstr(pos_x,pos_y,print_head,curses.color_pair(3))
             pos_x += 1
-
-
-            '''
-            cur = 'BTC'
-            stdscr.addstr(pos_x,pos_y,"BTC \t\t%7.2f \t%7.2f \t%7.2f, \t%7.2f "%(self.p_info[cur]['last']['price'], self.k_info[cur]['last']['price'],self.k_info[cur]['last']['price']-self.p_info[cur]['last']['price'], (self.k_info[cur]['last']['price']-self.p_info[cur]['last']['price'])*100/self.p_info[cur]['last']['price']),curses.color_pair(3))
-            pos_x += 1
-            cur = 'LTC'
-            stdscr.addstr(pos_x,pos_y,"LTC \t\t%7.2f \t%7.2f \t%7.2f, \t%7.2f"%(self.p_info[cur]['last']['price'], self.k_info[cur]['last']['price'],self.k_info[cur]['last']['price']-self.p_info[cur]['last']['price'], (self.k_info[cur]['last']['price']-self.p_info[cur]['last']['price'])*100/self.p_info[cur]['last']['price']),curses.color_pair(3))
-            pos_x += 1
-            cur = 'ETH'
-            stdscr.addstr(pos_x,pos_y,"ETH \t\t%7.2f \t%7.2f \t%7.2f, \t%7.2f"%(self.p_info[cur]['last']['price'], self.k_info[cur]['last']['price'],self.k_info[cur]['last']['price']-self.p_info[cur]['last']['price'], (self.k_info[cur]['last']['price']-self.p_info[cur]['last']['price'])*100/self.p_info[cur]['last']['price']),curses.color_pair(3))
-            pos_x += 1
-            cur = 'XRP'
-            prt_str = "XRP \t\t%7.2f \t%7.2f \t%7.2f, \t%7.2f"%(self.p_info[cur]['last']['price'], self.k_info[cur]['last']['price'],self.k_info[cur]['last']['price']-self.p_info[cur]['last']['price'], (self.k_info[cur]['last']['price']-self.p_info[cur]['last']['price'])*100/self.p_info[cur]['last']['price'])
-            stdscr.addstr(pos_x,pos_y,prt_str,curses.color_pair(3))
-            pos_x += 1
-
-
-
-            cur = 'DASH'
-            prt_str = "DASH \t\t%7.2f \t%7.2f \t%7.2f, \t%7.2f"%(self.p_info[cur]['last']['price'], self.k_info[cur]['last']['price'],self.k_info[cur]['last']['price']-self.p_info[cur]['last']['price'], (self.k_info[cur]['last']['price']-self.p_info[cur]['last']['price'])*100/self.p_info[cur]['last']['price'])
-            stdscr.addstr(pos_x,pos_y,prt_str,curses.color_pair(3))
-            pos_x += 1
-            
-
-            cur = 'DOGE'
-            prt_str = "DOGE \t\t%7.2f \t%7.2f \t%7.2f, \t%7.2f"%(self.p_info[cur]['last']['price'], self.k_info[cur]['last']['price'],self.k_info[cur]['last']['price']-self.p_info[cur]['last']['price'], (self.k_info[cur]['last']['price']-self.p_info[cur]['last']['price'])*100/self.p_info[cur]['last']['price'])
-            stdscr.addstr(pos_x,pos_y,prt_str,curses.color_pair(3))
-            pos_x += 1
-            '''
-
-
             all_coin = ('BTC', 'LTC', 'ETH', 'XRP', 'DASH', 'DOGE')
+    	    logging.info(time_comp)
             for coin in all_coin:
                 cur = coin
                 #prt_str = coin + " \t\t%7.2f \t%7.2f \t%7.2f \t%7.2f \t%7.2f \t%7.2f \t%7.2f"%(self.p_info[cur]['last']['price'], self.k_info[cur]['last']['price'],self.k_info[cur]['last']['price']-self.p_info[cur]['last']['price'], (self.k_info[cur]['last']['price']-self.p_info[cur]['last']['price'])*100/self.p_info[cur]['last']['price'], self.y_info[cur]['last']['price'],self.y_info[cur]['last']['price']-self.p_info[cur]['last']['price'], (self.y_info[cur]['last']['price']-self.p_info[cur]['last']['price'])*100/self.p_info[cur]['last']['price'])
@@ -141,16 +110,15 @@ class auto_trade(cv.console_view):
                 if percent2 < -100 or percent2 > 100:
                     percent2 = -1.00
                 prt_str = coin + " \t\t%7.2f \t%7.2f \t%7.2f \t%7.2f \t%7.2f \t%7.2f \t%7.2f"%(self.p_info[cur]['last']['price'], self.k_info[cur]['last']['price'],self.k_info[cur]['last']['price']-self.p_info[cur]['last']['price'], percent1, self.y_info[cur]['last']['price'],self.y_info[cur]['last']['price']-self.p_info[cur]['last']['price'],percent2)
-                
-                #prt_str =  re.sub(r'(-[\d+\.\d]+)','--\t', prt_str)   
                 prt_str =  re.sub(r'(-1.00)','--\t', prt_str)   
+                #prt_str =  re.sub(r'(-[\d+\.\d]+)','--\t', prt_str)   
                 stdscr.addstr(pos_x,pos_y,prt_str,curses.color_pair(3))
                 pos_x += 1
 
-
-
+                log_str = coin + " %7.2f %7.2f %7.2f %7.2f %7.2f %7.2f %7.2f"%(self.p_info[cur]['last']['price'], self.k_info[cur]['last']['price'],self.k_info[cur]['last']['price']-self.p_info[cur]['last']['price'], percent1, self.y_info[cur]['last']['price'],self.y_info[cur]['last']['price']-self.p_info[cur]['last']['price'],percent2)
+                log_str =  re.sub(r'(-1.00)','--', log_str)   
+    	    	logging.info(log_str)
             stdscr.refresh()
-    	    logging.info(prt_str+time_comp)
             time.sleep(2)
 
     def start(self):
