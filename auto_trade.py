@@ -9,6 +9,7 @@ import fetch_coinmarket
 import fetch_yobit
 import fetch_poloniex
 import fetch_kraken
+import fetch_binance
 import thread
 import curses
 import monitor
@@ -48,6 +49,11 @@ class auto_trade(cv.console_view):
         self.yobit = fetch_yobit.fetch_yobit(90, 16, 45, 15)
         self.y_info = self.yobit.monitor_info
         self.yobit.get_ticker()
+
+    def start_binance(self, thrd_name,delay):
+        self.binance = fetch_binance.fetch_binance(90, 16, 45, 15)
+        self.binance_info = self.binance.monitor_info
+
     def start_poloniex(self, thrd_name,delay):
         self.poloniex = fetch_poloniex.fetch_poloniex(0,16,45,15)
         self.p_info = self.poloniex.monitor_info
@@ -68,7 +74,9 @@ class auto_trade(cv.console_view):
         while True:
             self.p_info = self.poloniex.monitor_info
             self.k_info = self.kraken.monitor_info
-            self.y_info = self.yobit.monitor_info
+            #self.y_info = self.yobit.monitor_info
+            #self.binance_info = self.binance.monitor_info
+            self.y_info = self.binance.monitor_info
             pos_x = 2
             pos_y = 2
             stdscr.box(curses.ACS_VLINE, curses.ACS_HLINE)
@@ -138,7 +146,8 @@ class auto_trade(cv.console_view):
         try:
             curses.initscr()
             #td1 = thread.start_new_thread( start_coin_market,('55',2) )
-            td2 = thread.start_new_thread( self.start_yobit,('5',2) )
+           # td2 = thread.start_new_thread( self.start_yobit,('5',2) )
+            td6 = thread.start_new_thread( self.start_binance,('9',2) )
             td3 = thread.start_new_thread( self.start_poloniex,('6',2) )
             td4 = thread.start_new_thread( self.start_kraken,('7',2) )
             td5 = thread.start_new_thread( self.start_monitor,('8',2) )
