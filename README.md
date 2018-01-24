@@ -1,5 +1,7 @@
 # auto-trade
-auto trade system for cryptocurrrency market
+a crypto trading bot compatible with many main-stream exchanges. 
+Add topics
+
 # RUN
 ```
 pip install -r requirements.txt
