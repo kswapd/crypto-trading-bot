@@ -78,46 +78,65 @@ class auto_trade(cv.console_view):
         while True:
             self.p_info = self.poloniex.monitor_info
             self.k_info = self.kraken.monitor_info
-            #self.y_info = self.yobit.monitor_info
-            #self.binance_info = self.binance.monitor_info
-            self.y_info = self.binance.monitor_info
+            self.y_info = self.yobit.monitor_info
+            self.binance_info = self.binance.monitor_info
+           
             pos_x = 2
             pos_y = 2
             stdscr.box(curses.ACS_VLINE, curses.ACS_HLINE)
             stdscr.addstr(pos_x,pos_y,'Monitor', curses.color_pair(3))
             pos_x += 1
+            nowtime = time.time()
             ptime =  time.strftime('%H:%M:%S', time.localtime(self.k_info['time']))
             ktime =  time.strftime('%H:%M:%S', time.localtime(self.p_info['time']))
             ytime =  time.strftime('%H:%M:%S', time.localtime(self.y_info['time']))
-            subtime = self.k_info['time'] - self.p_info['time']
-            suby_ptime = self.y_info['time'] - self.p_info['time']
-            stdscr.addstr(pos_x,pos_y,time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()) ), curses.color_pair(3))
+            binancetime =  time.strftime('%H:%M:%S', time.localtime(self.binance_info['time']))
+            
+            sub_ptime = self.p_info['time'] - nowtime
+            sub_ytime = self.y_info['time'] - nowtime
+            sub_ktime = self.k_info['time'] - nowtime
+            sub_binancetime = self.binance_info['time'] - nowtime
+
+
+            stdscr.addstr(pos_x,pos_y,time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(nowtime) ), curses.color_pair(3))
             pos_x += 1
-            time_comp = '|Cur-P:%.2fs|K-P:%.2fs|Y-P:%.2f'%(time.time()-self.p_info['time'], subtime, suby_ptime)
-            stdscr.addstr(pos_x, pos_y, 'P:'+ptime + '|K:' + ktime + '|Y:'+ytime+ time_comp, curses.color_pair(3))
+
+            time_comp = ' P:%.2fs|K:%.2f|Y:%.2f|Binance:%.2f'%(sub_ptime, sub_ktime, sub_ytime, sub_binancetime)
+            alltime_info = 'P:'+ptime + '|K:' + ktime + '|Y:'+ytime + '|Binance:'+binancetime + time_comp
+            stdscr.addstr(pos_x, pos_y, alltime_info, curses.color_pair(3))
             pos_x += 1
-            print_head =  "Symbol \tPoloniex($) \tKraken \t\tSub(K-P) \tPercent(K-P) \tYobit\t\tSub(Y-P) \tPercent(Y-P)"
+
+            print_head =  "Symbol \tSub(K-P) \tPercent(K-P) \tSub(Y-P) \tPercent(Y-P) \tSub(Binance-P) \tPercent(Binance-P)"
             stdscr.addstr(pos_x,pos_y,print_head,curses.color_pair(3))
             pos_x += 1
+            
             all_coin = ('BTC', 'LTC', 'ETH', 'XRP', 'DASH', 'DOGE')
-    	    logging.info(time_comp)
+    	    logging.info(alltime_info)
             for coin in all_coin:
                 cur = coin
                 #prt_str = coin + " \t\t%7.2f \t%7.2f \t%7.2f \t%7.2f \t%7.2f \t%7.2f \t%7.2f"%(self.p_info[cur]['last']['price'], self.k_info[cur]['last']['price'],self.k_info[cur]['last']['price']-self.p_info[cur]['last']['price'], (self.k_info[cur]['last']['price']-self.p_info[cur]['last']['price'])*100/self.p_info[cur]['last']['price'], self.y_info[cur]['last']['price'],self.y_info[cur]['last']['price']-self.p_info[cur]['last']['price'], (self.y_info[cur]['last']['price']-self.p_info[cur]['last']['price'])*100/self.p_info[cur]['last']['price'])
-                
- 		percent1 = (self.k_info[cur]['last']['price']-self.p_info[cur]['last']['price'])*100/self.p_info[cur]['last']['price']
+                sub1 = self.k_info[cur]['last']['price']-self.p_info[cur]['last']['price']
+ 		percent1 = sub1*100/self.p_info[cur]['last']['price']
                 if percent1 < -100 or percent1 > 100:
                     percent1 = -1.00
-                percent2 =  (self.y_info[cur]['last']['price']-self.p_info[cur]['last']['price'])*100/self.p_info[cur]['last']['price']
+
+                sub2 = self.y_info[cur]['last']['price']-self.p_info[cur]['last']['price']
+                percent2 =  sub2*100/self.p_info[cur]['last']['price']
                 if percent2 < -100 or percent2 > 100:
                     percent2 = -1.00
-                prt_str = coin + " \t\t%7.2f \t%7.2f \t%7.2f \t%7.2f \t%7.2f \t%7.2f \t%7.2f"%(self.p_info[cur]['last']['price'], self.k_info[cur]['last']['price'],self.k_info[cur]['last']['price']-self.p_info[cur]['last']['price'], percent1, self.y_info[cur]['last']['price'],self.y_info[cur]['last']['price']-self.p_info[cur]['last']['price'],percent2)
+
+                sub3 = self.binance_info[cur]['last']['price']-self.p_info[cur]['last']['price']
+                percent3 =  sub3*100/self.p_info[cur]['last']['price']
+                if percent3 < -100 or percent3 > 100:
+                    percent3 = -1.00
+
+                prt_str = coin + " \t\t%7.2f \t%7.2f \t%7.2f \t%7.2f \t%7.2f \t%7.2f"%(sub1, percent1, sub2,percent2, sub3, percent3)
                 prt_str =  re.sub(r'(-1.00)','--\t', prt_str)   
                 #prt_str =  re.sub(r'(-[\d+\.\d]+)','--\t', prt_str)   
                 stdscr.addstr(pos_x,pos_y,prt_str,curses.color_pair(3))
                 pos_x += 1
 
-                log_str = coin + " %7.2f %7.2f %7.2f %7.2f %7.2f %7.2f %7.2f"%(self.p_info[cur]['last']['price'], self.k_info[cur]['last']['price'],self.k_info[cur]['last']['price']-self.p_info[cur]['last']['price'], percent1, self.y_info[cur]['last']['price'],self.y_info[cur]['last']['price']-self.p_info[cur]['last']['price'],percent2)
+                log_str = prt_str
                 log_str =  re.sub(r'(-1.00)','--', log_str)   
     	    	logging.info(log_str)
             stdscr.refresh()
