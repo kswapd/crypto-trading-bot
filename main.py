@@ -12,11 +12,10 @@ import fetch_poloniex
 import fetch_kraken
 import thread
 import curses
-import auto_trade
 import auto_monitor
 if __name__ == "__main__":
-    trade = auto_trade.auto_trade()
+    monitor = auto_monitor.auto_monitor()
     try:
-        trade.start()
+        monitor.start()
     except KeyboardInterrupt as e:
-        trade.stop()
+        monitor.stop()
