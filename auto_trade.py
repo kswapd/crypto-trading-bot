@@ -19,7 +19,7 @@ from logging.handlers import RotatingFileHandler
 import re
 import console_view as cv
 class auto_trade(cv.console_view):
-    def __init__(self, x = 0, y = 0, width = 140, height = 15, is_view = True):
+    def __init__(self, x = 0, y = 0, width = 130, height = 15, is_view = True):
         cv.console_view.__init__(self, x, y, width, height, is_view)
         self.p_info = {}
         self.k_info = {}
