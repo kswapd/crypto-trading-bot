@@ -16,7 +16,8 @@ class fetch_kraken(cv.console_view):
         self.method = ('depth','ticker','trades', 'info')
         self.trade_list = ('XXBTZUSD', 'XLTCZUSD', 'BCHUSD', 'XETHZUSD', 'XXRPZUSD','DASHUSD') 
         #self.coin_url = "https://api.coinmarketcap.com/v1/ticker/?limit=%d"%self.num
-	self.base_url = 'https://api.kraken.com/0/public/Ticker?pair='
+        self.base_url = 'https://api.kraken.com/0/public/Ticker?pair='
+        self.order_book_url = 'https://api.kraken.com/0/public/Depth?count=1&pair='
         self.send_headers = {
  'Accept':'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
  'User-Agent':'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/63.0.3239.132 Safari/537.36',
