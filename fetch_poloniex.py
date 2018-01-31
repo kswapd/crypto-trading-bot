@@ -100,7 +100,7 @@ class fetch_poloniex(cv.console_view):
         while not self.is_stop:
             self.get_ticker()
             self.get_order_book()
-            print '{:}'.format(self.monitor_info)
+            #print '{:}'.format(self.monitor_info)
             time.sleep(2)
 
 if __name__ == "__main__":

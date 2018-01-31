@@ -35,79 +35,61 @@ class fetch_kraken(cv.console_view):
         self.symbol_info_pair = {'XXBTZUSD':'BTC','XLTCZUSD':'LTC','XETHZUSD':'ETH','XXRPZUSD':'XRP', 'DASHUSD':'DASH'}
     def stop(self):
         self.is_stop = True
-        curses.endwin()
         print('stopped')
 
+    def get_open_info(self):
+        while not self.is_stop:
+            self.get_ticker()
+            self.get_order_book()
+            time.sleep(2)
     def get_ticker(self):
         ticker_url = self.base_url+','.join(self.trade_list)
-        print(ticker_url)
-        #self.stdscr = curses.initscr()
-        #self.stdscr = curses.initscr()
-        #self.stdscr = curses.newwin(15, 80, 16, 80)
-        self.stdscr = curses.newwin(self.display_pos['height'], self.display_pos['width'], self.display_pos['y'], self.display_pos['x'])
-
-        #self.stdscr = curses.newpad(600, 800)
-        curses.start_color()
-        curses.init_pair(1, curses.COLOR_GREEN, curses.COLOR_BLACK)
-        curses.init_pair(2, curses.COLOR_RED, curses.COLOR_BLACK)
-        curses.init_pair(3, curses.COLOR_YELLOW, curses.COLOR_BLACK)
-
-        while not self.is_stop:
-            cur_pos_x = 2;
+        req = urllib2.Request(ticker_url, headers=self.send_headers)
+        try:
+            res = urllib2.urlopen(req,timeout=5)
+            page = res.read()
+            json_obj_all = json.loads(page)
+            json_obj = json_obj_all['result']
+            self.monitor_info['time'] = time.time()
+            for pair in self.trade_list:
+                if self.symbol_info_pair.has_key(pair):
+                    self.monitor_info[self.symbol_info_pair[pair]]['last']['price'] = float(json_obj[pair]['c'][0])
+                    self.monitor_info[self.symbol_info_pair[pair]]['bid']['price'] = float(json_obj[pair]['b'][0])
+                    self.monitor_info[self.symbol_info_pair[pair]]['ask']['price'] = float(json_obj[pair]['a'][0])
+        except Exception,e:
+            err = 'Get kraken ticker error.' 
+            logging.info(err)
+            time.sleep(1)
+    def get_order_book(self):
+        for stock in self.trade_list:
+            ticker_url = self.order_book_url+stock
             req = urllib2.Request(ticker_url, headers=self.send_headers)
             try:
                 res = urllib2.urlopen(req,timeout=5)
                 page = res.read()
                 json_obj_all = json.loads(page)
                 json_obj = json_obj_all['result']
-            except Exception,e:
-                err = 'Get kraken data error, please set right cookies'
-                self.stdscr.addstr(cur_pos_x,self.pos_y,err,curses.color_pair(3))
-                self.stdscr.refresh()
-                time.sleep(2)
-                continue
-            #print(page)
-            self.stdscr.box(curses.ACS_VLINE, curses.ACS_HLINE)
-            self.stdscr.addstr(cur_pos_x,self.pos_y,'Kraken', curses.color_pair(3))
-            cur_pos_x += 1;
-            self.stdscr.addstr(cur_pos_x,self.pos_y,time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()) ), curses.color_pair(3))
-            cur_pos_x += 1;
-            if self.view_mode == 'simp':
-                print_head =  "Symbol \tLast($)"
-            elif self.view_mode == 'complete':
-                print_head =  "Symbol \tLast($) \tBuy \t\tSell \t\tPer"
-            self.stdscr.addstr(cur_pos_x,self.pos_y,print_head,curses.color_pair(3))
-            cur_pos_x += 1;
-            for pair in self.trade_list:
-                color_index = 1
                 self.monitor_info['time'] = time.time()
+                pair = stock
                 if self.symbol_info_pair.has_key(pair):
-                    self.monitor_info[self.symbol_info_pair[pair]]['last']['price'] = float(json_obj[pair]['c'][0])
-                    self.monitor_info[self.symbol_info_pair[pair]]['bid']['price'] = float(json_obj[pair]['b'][0])
-                    self.monitor_info[self.symbol_info_pair[pair]]['ask']['price'] = float(json_obj[pair]['a'][0])
+                    self.monitor_info[self.symbol_info_pair[pair]]['bid']['price'] = float(json_obj[pair]['bids'][0][0])
+                    self.monitor_info[self.symbol_info_pair[pair]]['ask']['price'] = float(json_obj[pair]['asks'][0][0])
+                    self.monitor_info[self.symbol_info_pair[pair]]['bid']['num'] = float(json_obj[pair]['bids'][0][1])
+                    self.monitor_info[self.symbol_info_pair[pair]]['ask']['num'] = float(json_obj[pair]['asks'][0][1])
 
-                if pair in self.trade_list:
-                    #print_content =  "sym:%7s \tprice:%10s \tper:%5s"%(json_obj[i]['symbol'], json_obj[i]['price_usd'], json_obj[i]['percent_change_24h']);
-                    if self.view_mode == 'simp':
-                        print_content =  "%7s \t%7.2f"%(pair, float(json_obj[pair]['c'][0]));
-                    elif self.view_mode == 'complete':   
-                        print_content =  "%7s \t%7.2f \t%7.2f \t%7.2f"%(pair, float(json_obj[pair]['c'][0]), float(json_obj[pair]['b'][0]), float(json_obj[pair]['a'][0]));
-                    
-                    if not True:
-                        color_index = 2
-                    self.stdscr.addstr(cur_pos_x,self.pos_y,print_content,curses.color_pair(color_index))
-                    cur_pos_x += 1
-
-                #print "hi:%d\r"%i
-                #stdscr.addstr(i, 0,  "hi:%d"%i)
-                #sys.stdout.flush()
-                self.stdscr.refresh()
-            time.sleep(2)
+            except Exception,e:
+                err = 'Get kraken order book error.' 
+                logging.info(err)
+                time.sleep(1)
 if __name__ == "__main__":
-    curses.initscr()
+    logging.basicConfig(level=logging.DEBUG,
+                    format='%(asctime)s %(filename)s[line:%(lineno)d] %(levelname)s %(message)s',
+                    datefmt='%a, %d %b %Y %H:%M:%S',
+                    filename='test.log',
+                    filemode='w')
     info = fetch_kraken()
     try:
-        info.get_ticker()
+        info.get_open_info()
     except KeyboardInterrupt as e:
         info.stop()
     

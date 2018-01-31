@@ -61,11 +61,11 @@ class auto_monitor(cv.console_view):
     def start_poloniex(self, thrd_name,delay):
         self.poloniex = fetch_poloniex.fetch_poloniex(0,self.min_y,self.min_w,self.min_h)
         self.p_info = self.poloniex.monitor_info
-        self.poloniex.get_ticker()
+        self.poloniex.get_open_info()
     def start_kraken(self, thrd_name,delay):
         self.kraken = fetch_kraken.fetch_kraken(self.min_w,self.min_y,self.min_w,self.min_h)
         self.k_info = self.kraken.monitor_info
-        self.kraken.get_ticker()
+        self.kraken.get_open_info()
     def start_monitor(self, thrd_name,delay):
         time.sleep(2)
         #stdscr = curses.newwin(15, 140, 0, 0)
@@ -135,12 +135,13 @@ class auto_monitor(cv.console_view):
                     percent3 = -1.00
 
                 prt_str = coin + " \t\t%7.2f \t%7.2f \t%7.2f \t%7.2f \t%7.2f \t%7.2f"%(sub1, percent1, sub2,percent2, sub3, percent3)
+                num_str = "\t%7.2f \t%7.2f \t%7.2f \t%7.2f"%(self.p_info[cur]['bid']['num'], self.p_info[cur]['ask']['num'], self.k_info[cur]['bid']['num'], self.k_info[cur]['ask']['num'])
                 prt_str =  re.sub(r'(-1.00)','--\t', prt_str)   
                 #prt_str =  re.sub(r'(-[\d+\.\d]+)','--\t', prt_str)   
                 stdscr.addstr(pos_x,pos_y,prt_str,curses.color_pair(3))
                 pos_x += 1
 
-                log_str = prt_str
+                log_str = prt_str + num_str
                 log_str =  re.sub(r'(-1.00)','--', log_str)   
     	    	logging.info(log_str)
             stdscr.refresh()
