@@ -115,15 +115,19 @@ class auto_monitor(cv.console_view):
             for coin in all_coin:
                 cur = coin
                 #prt_str = coin + " \t\t%7.2f \t%7.2f \t%7.2f \t%7.2f \t%7.2f \t%7.2f \t%7.2f"%(self.p_info[cur]['last']['price'], self.k_info[cur]['last']['price'],self.k_info[cur]['last']['price']-self.p_info[cur]['last']['price'], (self.k_info[cur]['last']['price']-self.p_info[cur]['last']['price'])*100/self.p_info[cur]['last']['price'], self.y_info[cur]['last']['price'],self.y_info[cur]['last']['price']-self.p_info[cur]['last']['price'], (self.y_info[cur]['last']['price']-self.p_info[cur]['last']['price'])*100/self.p_info[cur]['last']['price'])
-                sub1 = self.k_info[cur]['last']['price']-self.p_info[cur]['last']['price']
- 		percent1 = sub1*100/self.p_info[cur]['last']['price']
+                sub1 = self.p_info[cur]['bid']['price']-self.k_info[cur]['ask']['price']
+ 		percent1 = sub1*100/self.k_info[cur]['ask']['price']
                 if percent1 < -100 or percent1 > 100:
                     percent1 = -1.00
 
-                sub2 = self.y_info[cur]['last']['price']-self.p_info[cur]['last']['price']
-                percent2 =  sub2*100/self.p_info[cur]['last']['price']
+                sub2 = self.k_info[cur]['bid']['price']-self.p_info[cur]['ask']['price']
+ 		percent2 = sub2*100/self.p_info[cur]['ask']['price']
                 if percent2 < -100 or percent2 > 100:
                     percent2 = -1.00
+                #sub2 = self.y_info[cur]['last']['price']-self.p_info[cur]['last']['price']
+                #percent2 =  sub2*100/self.p_info[cur]['last']['price']
+                #if percent2 < -100 or percent2 > 100:
+                #    percent2 = -1.00
 
                 sub3 = self.binance_info[cur]['last']['price']-self.p_info[cur]['last']['price']
                 percent3 =  sub3*100/self.p_info[cur]['last']['price']
@@ -146,7 +150,7 @@ class auto_monitor(cv.console_view):
         try:
             curses.initscr()
 	    curses.noecho()
-	    curses.cbreak()
+	    #curses.cbreak()
 	    curses.curs_set(0)
             #td1 = thread.start_new_thread( start_coin_market,('55',2) )
             td2 = thread.start_new_thread( self.start_yobit,('5',2) )
