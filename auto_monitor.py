@@ -116,12 +116,12 @@ class auto_monitor(cv.console_view):
                 cur = coin
                 #prt_str = coin + " \t\t%7.2f \t%7.2f \t%7.2f \t%7.2f \t%7.2f \t%7.2f \t%7.2f"%(self.p_info[cur]['last']['price'], self.k_info[cur]['last']['price'],self.k_info[cur]['last']['price']-self.p_info[cur]['last']['price'], (self.k_info[cur]['last']['price']-self.p_info[cur]['last']['price'])*100/self.p_info[cur]['last']['price'], self.y_info[cur]['last']['price'],self.y_info[cur]['last']['price']-self.p_info[cur]['last']['price'], (self.y_info[cur]['last']['price']-self.p_info[cur]['last']['price'])*100/self.p_info[cur]['last']['price'])
                 sub1 = self.p_info[cur]['bid']['price']-self.k_info[cur]['ask']['price']
- 		percent1 = sub1*100/self.k_info[cur]['ask']['price']
+                percent1 = sub1*100/self.k_info[cur]['ask']['price']
                 if percent1 < -100 or percent1 > 100:
                     percent1 = -1.00
 
                 sub2 = self.k_info[cur]['bid']['price']-self.p_info[cur]['ask']['price']
- 		percent2 = sub2*100/self.p_info[cur]['ask']['price']
+                percent2 = sub2*100/self.p_info[cur]['ask']['price']
                 if percent2 < -100 or percent2 > 100:
                     percent2 = -1.00
                 #sub2 = self.y_info[cur]['last']['price']-self.p_info[cur]['last']['price']
