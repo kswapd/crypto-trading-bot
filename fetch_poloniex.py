@@ -107,9 +107,9 @@ class fetch_poloniex(cv.console_view):
             #print(json_obj['SDC'])	
             #print('{:}'.format(json_obj))	
             for (k,v) in json_obj.items():
-                #if float(v)>0.000001:
+                if float(v)>0.000001:
                 #    print (k,v)
-                self.cur_balances[k] = float(v)
+                    self.cur_balances[k] = float(v)
         except Exception,e:
             err = 'Get poloniex balance error'
             print e
