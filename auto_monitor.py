@@ -111,7 +111,7 @@ class auto_monitor(cv.console_view):
             pos_x += 1
             
             all_coin = ('BTC', 'LTC', 'ETH', 'XRP', 'DASH', 'DOGE')
-    	    logging.info(alltime_info)
+    	    #logging.info(alltime_info)
             for coin in all_coin:
                 cur = coin
                 #prt_str = coin + " \t\t%7.2f \t%7.2f \t%7.2f \t%7.2f \t%7.2f \t%7.2f \t%7.2f"%(self.p_info[cur]['last']['price'], self.k_info[cur]['last']['price'],self.k_info[cur]['last']['price']-self.p_info[cur]['last']['price'], (self.k_info[cur]['last']['price']-self.p_info[cur]['last']['price'])*100/self.p_info[cur]['last']['price'], self.y_info[cur]['last']['price'],self.y_info[cur]['last']['price']-self.p_info[cur]['last']['price'], (self.y_info[cur]['last']['price']-self.p_info[cur]['last']['price'])*100/self.p_info[cur]['last']['price'])
@@ -119,6 +119,11 @@ class auto_monitor(cv.console_view):
                 percent1 = sub1*100/self.k_info[cur]['ask']['price']
                 if percent1 < -100 or percent1 > 100:
                     percent1 = -1.00
+
+                if percent1 > 4.0:
+                    logging.info('get sell chance:%.2f,%.2f, %.2f,%.2f'%(self.p_info[cur]['bid']['price'], self.p_info[cur]['bid']['num'],self.k_info[cur]['ask']['price'], percent1))
+                    self.poloniex.sell('XRP', self.p_info[cur]['bid']['price'], self.p_info[cur]['bid']['num'])
+                
 
                 sub2 = self.k_info[cur]['bid']['price']-self.p_info[cur]['ask']['price']
                 percent2 = sub2*100/self.p_info[cur]['ask']['price']
@@ -141,9 +146,9 @@ class auto_monitor(cv.console_view):
                 stdscr.addstr(pos_x,pos_y,prt_str,curses.color_pair(3))
                 pos_x += 1
 
-                log_str = prt_str + num_str
-                log_str =  re.sub(r'(-1.00)','--', log_str)   
-    	    	logging.info(log_str)
+                #log_str = prt_str + num_str
+                #log_str =  re.sub(r'(-1.00)','--', log_str)   
+    	    	#logging.info(log_str)
             stdscr.refresh()
             time.sleep(2)
 

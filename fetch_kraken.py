@@ -40,7 +40,7 @@ class fetch_kraken(cv.console_view):
     def get_open_info(self):
         while not self.is_stop:
             self.get_ticker()
-            self.get_order_book()
+            #self.get_order_book()
             time.sleep(2)
     def get_ticker(self):
         ticker_url = self.base_url+','.join(self.trade_list)

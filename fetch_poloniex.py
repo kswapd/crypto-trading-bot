@@ -19,17 +19,19 @@ class fetch_poloniex(cv.console_view):
         self.trade_list = ('ltc_usd', 'btc_usd', 'eth_usd', 'bcc_usd', 'dash_usd', 'doge_usd') 
         #self.coin_url = "https://api.coinmarketcap.com/v1/ticker/?limit=%d"%self.num
         self.base_url = 'https://poloniex.com/public?command=returnTicker'
+        self.trade_base_url ='https://poloniex.com/tradingApi'
         self.order_book_url = 'https://poloniex.com/public?command=returnOrderBook&&currencyPair=all&depth=1'
         self.send_headers = {
  'Accept':'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
  'User-Agent':'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:55.0) Gecko/20100101 Firefox/55.0',
  'Cookie':'__cfduid=d92eb21c1dd0e150a8e730ef1e8780fd61516264900; cf_clearance=e61fba35a2c2bdc9cd35af99cb5ca9112244f353-1516613184-1800'
 } 
-        #keys_conf = conf.TradeKeys()
-        #self.apikey = keys_conf.keys_info['poloniex']['public']
-        #self.secret = keys_conf.keys_info['poloniex']['secret']
-        self.apikey = 'aaa'
-        self.secret = 'bbb'
+        keys_conf = conf.TradeKeys()
+        self.cur_balances = {}
+        self.apikey = keys_conf.keys_info['poloniex']['public']
+        self.secret = keys_conf.keys_info['poloniex']['secret']
+        ##self.apikey = 'aaa'
+        #self.secret = 'bbb'
         #self.display_pos = {'x':0, 'y':16, 'width':80, 'height':15}
 	#print(self.secret)
 	#print(self.apikey)
@@ -47,13 +49,81 @@ class fetch_poloniex(cv.console_view):
     def stop(self):
         self.is_stop = True
         print('stopped')
+    def sell(self, symbol, price, num):
+        logging.info('start sell:%s,%.2f,%.2f'%(symbol, price, num))
+        self.get_balance()
+        if(not self.cur_balances.has_key(symbol)):
+            logging.info('not get this symbol:%s, return'%symbol)
+            return
+        to_sell_num = num
+        if self.cur_balances[symbol] <  to_sell_num:
+            to_sell_num = self.cur_balances[symbol]
+        logging.info('selling num:%.2f'%to_sell_num)
+
+        self.send_headers = {}
+        myreq  = {}
+        myreq['currencyPair'] = 'USDT_LTC'
+        myreq['rate'] = price
+        myreq['amount'] = to_sell_num
+        myreq['command'] = 'sell' 
+        myreq['nonce'] = int(time.time()*1000)
+        post_data = urllib.urlencode(myreq)
+        mysign = hmac.new(self.secret, post_data, hashlib.sha512).hexdigest()
+        self.send_headers['Sign'] = mysign
+        self.send_headers['Key'] = self.apikey
+        req = urllib2.Request(self.trade_base_url,post_data, headers=self.send_headers)
+        try:
+            res = urllib2.urlopen(req,timeout=5)
+            page = res.read()
+            json_obj = json.loads(page)
+            logging.info('sell success'+'{:}'.format(json_obj))
+        except Exception,e:
+            err = 'sell at poloniex error'
+            logging.info(err)
+            logging.info(e)
+            time.sleep(1)
+    def get_balance(self):
+        self.cur_balances = {}
+        self.send_headers = {}
+        myreq  = {}
+        myreq['command'] = 'returnBalances' 
+        myreq['nonce'] = int(time.time()*1000)
+        post_data = urllib.urlencode(myreq)
+        #print (self.secret, self.apikey)
+        mysign = hmac.new(self.secret, post_data, hashlib.sha512).hexdigest()
+        self.send_headers['Sign'] = mysign
+        self.send_headers['Key'] = self.apikey
+        #print('{:}'.format(self.send_headers))	
+        req = urllib2.Request(self.trade_base_url,post_data, headers=self.send_headers)
+        #ret = urllib2.urlopen(urllib2.Request('https://poloniex.com/tradingApi', post_data, headers))
+            #elf.send_headers['Key'] = self.apikey
+            #    'Sign': mysign,
+            #    'Key': self.apikey
+            #}
+        try:
+            res = urllib2.urlopen(req,timeout=5)
+            page = res.read()
+            json_obj = json.loads(page)
+            #print(json_obj['SDC'])	
+            #print('{:}'.format(json_obj))	
+            for (k,v) in json_obj.items():
+                #if float(v)>0.000001:
+                #    print (k,v)
+                self.cur_balances[k] = float(v)
+        except Exception,e:
+            err = 'Get poloniex balance error'
+            print e
+            logging.info(err)
+            time.sleep(1)
+
+        logging.info('get balances:'+'{:}'.format(self.cur_balances))
+
     def get_ticker(self):
         ticker_url = self.base_url
             #myreq  = {}
             #myreq['command'] = 'returnTicker' 
             #myreq['nonce'] = int(time.time()*1000)
             #post_data = urllib.urlencode(myreq)
-
             #mysign = hmac.new(self.secret, post_data, hashlib.sha512).hexdigest()
             #self.send_headers['Sign'] = mysign
             #elf.send_headers['Key'] = self.apikey
@@ -111,7 +181,8 @@ if __name__ == "__main__":
                     filemode='w')
     info = fetch_poloniex()
     try:
-        info.get_open_info()
+        #info.get_open_info()
+        info.get_balance()
     except KeyboardInterrupt as e:
         info.stop()
     
