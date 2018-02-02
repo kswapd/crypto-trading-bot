@@ -67,6 +67,7 @@ class auto_monitor(cv.console_view):
         self.k_info = self.kraken.monitor_info
         self.kraken.get_open_info()
     def start_monitor(self, thrd_name,delay):
+        logging.info('start monitor...')
         time.sleep(2)
         #stdscr = curses.newwin(15, 140, 0, 0)
         stdscr = curses.newwin(self.display_pos['height'], self.display_pos['width'], self.display_pos['y'], self.display_pos['x'])
@@ -120,9 +121,9 @@ class auto_monitor(cv.console_view):
                 if percent1 < -100 or percent1 > 100:
                     percent1 = -1.00
 
-                if percent1 > 4.0:
+                if percent1 > 4.0 and cur=='LTC':
                     logging.info('get sell chance:%.2f,%.2f, %.2f,%.2f'%(self.p_info[cur]['bid']['price'], self.p_info[cur]['bid']['num'],self.k_info[cur]['ask']['price'], percent1))
-                    self.poloniex.sell('XRP', self.p_info[cur]['bid']['price'], self.p_info[cur]['bid']['num'])
+                    self.poloniex.sell('LTC', self.p_info[cur]['bid']['price'], self.p_info[cur]['bid']['num'])
                 
 
                 sub2 = self.k_info[cur]['bid']['price']-self.p_info[cur]['ask']['price']

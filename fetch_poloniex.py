@@ -8,6 +8,7 @@ import hmac,hashlib
 import conf
 import console_view as cv
 import logging
+import requests
 class fetch_poloniex(cv.console_view):
     def __init__(self, x = 0, y = 16, width = 80, height = 15, is_view = True):
         cv.console_view.__init__(self, x, y, width, height, is_view)
@@ -50,7 +51,7 @@ class fetch_poloniex(cv.console_view):
         self.is_stop = True
         print('stopped')
     def sell(self, symbol, price, num):
-        logging.info('start sell:%s,%.2f,%.2f'%(symbol, price, num))
+        logging.info('start sell:%s,%.2f,%.5f'%(symbol, price, num))
         self.get_balance()
         if(not self.cur_balances.has_key(symbol)):
             logging.info('not get this symbol:%s, return'%symbol)
@@ -58,7 +59,11 @@ class fetch_poloniex(cv.console_view):
         to_sell_num = num
         if self.cur_balances[symbol] <  to_sell_num:
             to_sell_num = self.cur_balances[symbol]
-        logging.info('selling num:%.2f'%to_sell_num)
+        if to_sell_num > 0.12:
+            to_sell_num = 0.12
+        if to_sell_num < 0.01:
+            to_sell_num = 0.01
+        logging.info('selling num:%.5f'%to_sell_num)
 
         self.send_headers = {}
         myreq  = {}
@@ -73,9 +78,12 @@ class fetch_poloniex(cv.console_view):
         self.send_headers['Key'] = self.apikey
         req = urllib2.Request(self.trade_base_url,post_data, headers=self.send_headers)
         try:
-            res = urllib2.urlopen(req,timeout=5)
-            page = res.read()
-            json_obj = json.loads(page)
+            #res = urllib2.urlopen(req,timeout=5)
+            #page = res.read()
+            #json_obj = json.loads(page)
+
+            ret = requests.post(self.trade_base_url, data=myreq, headers=self.send_headers)
+            json_obj = json.loads(ret.text)
             logging.info('sell success'+'{:}'.format(json_obj))
         except Exception,e:
             err = 'sell at poloniex error'
@@ -183,6 +191,7 @@ if __name__ == "__main__":
     try:
         #info.get_open_info()
         info.get_balance()
+        #info.sell('LTC', 130.0, 0.01)
     except KeyboardInterrupt as e:
         info.stop()
     
