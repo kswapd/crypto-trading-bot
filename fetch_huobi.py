@@ -4,11 +4,13 @@ import urllib,urllib2
 import json
 import sys, time
 import curses
-import hmac,hashlib
+import hmac,hashlib,base64
 import conf
 import console_view as cv
 import logging
 #import requests
+import datetime
+import collections
 class fetch_huobi(cv.console_view):
     def __init__(self, x = 0, y = 16, width = 80, height = 15, is_view = True):
         cv.console_view.__init__(self, x, y, width, height, is_view)
@@ -19,8 +21,6 @@ class fetch_huobi(cv.console_view):
         #self.coin_url = "https://api.coinmarketcap.com/v1/ticker/?limit=%d"%self.num
         self.base_url_inner = 'https://api.huobipro.com/'
         self.base_url_outer = 'https://api.huobi.pro/'
-        self.market = 'market'
-        self.trade = 'v1'
         self.trade_base_url ='https://poloniex.com/tradingApi'
         self.order_book_url = 'https://poloniex.com/public?command=returnOrderBook&&currencyPair=all&depth=1'
         self.send_headers = {
@@ -29,8 +29,8 @@ class fetch_huobi(cv.console_view):
 } 
         keys_conf = conf.TradeKeys()
         self.cur_balances = {}
-        self.apikey = keys_conf.keys_info['poloniex']['public']
-        self.secret = keys_conf.keys_info['poloniex']['secret']
+        self.apikey = keys_conf.keys_info['huobi']['public']
+        self.secret = keys_conf.keys_info['huobi']['secret']
         ##self.apikey = 'aaa'
         #self.secret = 'bbb'
         #self.display_pos = {'x':0, 'y':16, 'width':80, 'height':15}
@@ -66,6 +66,7 @@ class fetch_huobi(cv.console_view):
         logging.info('selling num:%.5f'%to_sell_num)
 
         self.send_headers = {}
+
         myreq  = {}
         myreq['currencyPair'] = 'USDT_LTC'
         myreq['rate'] = price
@@ -73,6 +74,7 @@ class fetch_huobi(cv.console_view):
         myreq['command'] = 'sell' 
         myreq['nonce'] = int(time.time()*1000)
         post_data = urllib.urlencode(myreq)
+        
         mysign = hmac.new(self.secret, post_data, hashlib.sha512).hexdigest()
         self.send_headers['Sign'] = mysign
         self.send_headers['Key'] = self.apikey
@@ -91,18 +93,40 @@ class fetch_huobi(cv.console_view):
             logging.info(e)
             time.sleep(1)
     def get_balance(self):
+        msg = collections.OrderedDict()
+        msg['AccessKeyId'] = self.apikey
+        msg['SignatureMethod'] = 'HmacSHA256'
+        msg['SignatureVersion'] = '2'
+        utc_datetime = datetime.datetime.utcnow()
+        utcmsg = utc_datetime.strftime("%Y-%m-%dT%H:%M:%S")
+        msg['Timestamp'] = utcmsg#time.strftime("%Y-%m-%dT%H:%M:%S", time.localtime())
+        print(msg['Timestamp'])
+        msg_Method = 'GET\n'
+        msg_Url = 'api.huobi.pro\n'
+        msg_Path = '/v1/account/accounts/991115/balance\n'
+        message_head = msg_Method+msg_Url+msg_Path
+        message_param = urllib.urlencode(msg)
+        print(message_param)
+        message_all = message_head + message_param
+
+        print(message_all)
+        self.balance_url = self.base_url_outer  +  'v1/account/accounts/991115/balance'
         self.cur_balances = {}
         self.send_headers = {}
-        myreq  = {}
-        myreq['command'] = 'returnBalances' 
-        myreq['nonce'] = int(time.time()*1000)
-        post_data = urllib.urlencode(myreq)
+        
+        
         #print (self.secret, self.apikey)
-        mysign = hmac.new(self.secret, post_data, hashlib.sha512).hexdigest()
-        self.send_headers['Sign'] = mysign
-        self.send_headers['Key'] = self.apikey
+        signature = base64.b64encode(hmac.new(self.secret, message_all, digestmod=hashlib.sha256).digest())
+        #mysign = hmac.new(self.secret, post_data, hashlib.sha512).hexdigest()
+        #self.send_headers['Sign'] = mysign
+        #self.send_headers['Key'] = self.apikey
+
+
+        req_url = self.balance_url + '?' + 'AccessKeyId='+msg['AccessKeyId']+'&SignatureMethod='+msg['SignatureMethod']+'&SignatureVersion='+ \
+        msg['SignatureVersion']+'&Timestamp='+urllib.quote(msg['Timestamp'])+'&Signature='+signature
+        print(req_url)
         #print('{:}'.format(self.send_headers))	
-        req = urllib2.Request(self.trade_base_url,post_data, headers=self.send_headers)
+        req = urllib2.Request(req_url, headers=self.send_headers)
         #ret = urllib2.urlopen(urllib2.Request('https://poloniex.com/tradingApi', post_data, headers))
             #elf.send_headers['Key'] = self.apikey
             #    'Sign': mysign,
@@ -112,14 +136,14 @@ class fetch_huobi(cv.console_view):
             res = urllib2.urlopen(req,timeout=5)
             page = res.read()
             json_obj = json.loads(page)
-            #print(json_obj['SDC'])	
+            #print(json_obj)	
             #print('{:}'.format(json_obj))	
-            for (k,v) in json_obj.items():
-                if float(v)>0.000001:
-                #    print (k,v)
-                    self.cur_balances[k] = float(v)
+            for item in json_obj['data']['list']:
+                if float(item['balance'])>0.000001 and item['type'] != 'frozen':
+                    self.cur_balances[item['currency']] = float(item['balance'])
+            print('{:}'.format(self.cur_balances))
         except Exception,e:
-            err = 'Get poloniex balance error'
+            err = 'Get huobi balance error'
             print e
             logging.info(err)
             time.sleep(1)
@@ -127,7 +151,7 @@ class fetch_huobi(cv.console_view):
         logging.info('get balances:'+'{:}'.format(self.cur_balances))
 
     def get_ticker(self):
-        ticker_url = self.base_url_inner+'market/detail/merged?symbol=ltcusdt'
+        ticker_url = self.base_url_outer +'market/detail/merged?symbol=ltcusdt'
             #myreq  = {}
             #myreq['command'] = 'returnTicker' 
             #myreq['nonce'] = int(time.time()*1000)
@@ -174,8 +198,8 @@ if __name__ == "__main__":
                     filemode='w')
     info = fetch_huobi()
     try:
-        info.get_open_info()
-        #info.get_balance()
+        #info.get_open_info()
+        info.get_balance()
         #info.sell('LTC', 130.0, 0.01)
     except KeyboardInterrupt as e:
         info.stop()
