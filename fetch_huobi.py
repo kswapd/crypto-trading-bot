@@ -107,10 +107,10 @@ class fetch_huobi(cv.console_view):
         msg_Path = '/v1/account/accounts/991115/balance\n'
         message_head = msg_Method+msg_Url+msg_Path
         message_param = urllib.urlencode(msg)
-        print(message_param)
+        #print(message_param)
         message_all = message_head + message_param
 
-        print(message_all)
+        #print(message_all)
         self.balance_url = self.base_url_outer  +  'v1/account/accounts/991115/balance'
         self.cur_balances = {}
         self.send_headers = {}
@@ -142,6 +142,50 @@ class fetch_huobi(cv.console_view):
             time.sleep(1)
 
         logging.info('get balances:'+'{:}'.format(self.cur_balances))
+    def get_accounts(self):
+        msg = collections.OrderedDict()
+        msg['AccessKeyId'] = self.apikey
+        msg['SignatureMethod'] = 'HmacSHA256'
+        msg['SignatureVersion'] = '2'
+        utc_datetime = datetime.datetime.utcnow()
+        utcmsg = utc_datetime.strftime("%Y-%m-%dT%H:%M:%S")
+        msg['Timestamp'] = utcmsg#time.strftime("%Y-%m-%dT%H:%M:%S", time.localtime())
+        print(msg['Timestamp'])
+        msg_Method = 'GET\n'
+        msg_Url = 'api.huobi.pro\n'
+        msg_Path = '/v1/account/accounts\n'
+        message_head = msg_Method+msg_Url+msg_Path
+        message_param = urllib.urlencode(msg)
+        #print(message_param)
+        message_all = message_head + message_param
+
+        #print(message_all)
+        self.balance_url = self.base_url_outer  +  'v1/account/accounts'
+        self.cur_balances = {}
+        self.send_headers = {}
+        signature = base64.b64encode(hmac.new(self.secret, message_all, digestmod=hashlib.sha256).digest())
+        req_url = self.balance_url + '?' + 'AccessKeyId='+msg['AccessKeyId']+'&SignatureMethod='+msg['SignatureMethod']+'&SignatureVersion='+ \
+        msg['SignatureVersion']+'&Timestamp='+urllib.quote(msg['Timestamp'])+'&Signature='+signature
+        print(req_url)
+        #print('{:}'.format(self.send_headers)) 
+        req = urllib2.Request(req_url, headers=self.send_headers)
+        #ret = urllib2.urlopen(urllib2.Request('https://poloniex.com/tradingApi', post_data, headers))
+            #elf.send_headers['Key'] = self.apikey
+            #    'Sign': mysign,
+            #    'Key': self.apikey
+            #}
+        try:
+            res = urllib2.urlopen(req,timeout=5)
+            page = res.read()
+            json_obj = json.loads(page)
+            #print(json_obj)    
+            print('{:}'.format(json_obj))  
+           
+        except Exception,e:
+            err = 'Get huobi balance error'
+            print e
+            logging.info(err)
+            time.sleep(1)
 
     def get_ticker(self):
         ticker_url = self.base_url_outer +'market/detail/merged?symbol=ltcusdt'
@@ -192,6 +236,7 @@ if __name__ == "__main__":
     info = fetch_huobi()
     try:
         #info.get_open_info()
+        info.get_accounts()
         info.get_balance()
         #info.sell('LTC', 130.0, 0.01)
     except KeyboardInterrupt as e:
