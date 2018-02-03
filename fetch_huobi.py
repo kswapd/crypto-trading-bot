@@ -24,6 +24,7 @@ class fetch_huobi(cv.console_view):
         self.trade_base_url ='https://poloniex.com/tradingApi'
         self.order_book_url = 'https://poloniex.com/public?command=returnOrderBook&&currencyPair=all&depth=1'
         self.send_headers = {
+'Content-Type':'application/x-www-form-urlencoded',
  'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.71 Safari/537.36',
  'Cookie':'__cfduid=d92eb21c1dd0e150a8e730ef1e8780fd61516264900; cf_clearance=e61fba35a2c2bdc9cd35af99cb5ca9112244f353-1516613184-1800'
 } 
@@ -113,15 +114,7 @@ class fetch_huobi(cv.console_view):
         self.balance_url = self.base_url_outer  +  'v1/account/accounts/991115/balance'
         self.cur_balances = {}
         self.send_headers = {}
-        
-        
-        #print (self.secret, self.apikey)
         signature = base64.b64encode(hmac.new(self.secret, message_all, digestmod=hashlib.sha256).digest())
-        #mysign = hmac.new(self.secret, post_data, hashlib.sha512).hexdigest()
-        #self.send_headers['Sign'] = mysign
-        #self.send_headers['Key'] = self.apikey
-
-
         req_url = self.balance_url + '?' + 'AccessKeyId='+msg['AccessKeyId']+'&SignatureMethod='+msg['SignatureMethod']+'&SignatureVersion='+ \
         msg['SignatureVersion']+'&Timestamp='+urllib.quote(msg['Timestamp'])+'&Signature='+signature
         print(req_url)
