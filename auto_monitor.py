@@ -10,6 +10,7 @@ import fetch_yobit
 import fetch_poloniex
 import fetch_kraken
 import fetch_binance
+import fetch_huobi
 import thread
 import curses
 import monitor
@@ -62,6 +63,10 @@ class auto_monitor(cv.console_view):
         self.poloniex = fetch_poloniex.fetch_poloniex(0,self.min_y,self.min_w,self.min_h)
         self.p_info = self.poloniex.monitor_info
         self.poloniex.get_open_info()
+    def start_huobi(self, thrd_name,delay):
+        self.huobi = fetch_huobi.fetch_huobi(0,self.min_y,self.min_w,self.min_h)
+        self.huobi_info = self.huobi.monitor_info
+        self.huobi.get_open_info()
     def start_kraken(self, thrd_name,delay):
         self.kraken = fetch_kraken.fetch_kraken(self.min_w,self.min_y,self.min_w,self.min_h)
         self.k_info = self.kraken.monitor_info
@@ -78,9 +83,10 @@ class auto_monitor(cv.console_view):
         curses.init_pair(3, curses.COLOR_YELLOW, curses.COLOR_BLACK)
         while True:
             self.p_info = self.poloniex.monitor_info
-            self.k_info = self.kraken.monitor_info
-            self.y_info = self.yobit.monitor_info
-            self.binance_info = self.binance.monitor_info
+            #self.k_info = self.kraken.monitor_info
+            #self.y_info = self.yobit.monitor_info
+            #self.binance_info = self.binance.monitor_info
+            self.huobi_info = self.huobi.monitor_info
            
             pos_x = 2
             pos_y = 2
@@ -88,45 +94,45 @@ class auto_monitor(cv.console_view):
             stdscr.addstr(pos_x,pos_y,'Cryptocurrency exchange Monitor', curses.color_pair(3))
             pos_x += 1
             nowtime = time.time()
-            ptime =  time.strftime('%H:%M:%S', time.localtime(self.k_info['time']))
-            ktime =  time.strftime('%H:%M:%S', time.localtime(self.p_info['time']))
-            ytime =  time.strftime('%H:%M:%S', time.localtime(self.y_info['time']))
-            binancetime =  time.strftime('%H:%M:%S', time.localtime(self.binance_info['time']))
-            
+            ptime =  time.strftime('%H:%M:%S', time.localtime(self.p_info['time']))
+            #ktime =  time.strftime('%H:%M:%S', time.localtime(self.k_info['time']))
+            #ytime =  time.strftime('%H:%M:%S', time.localtime(self.y_info['time']))
+            #binancetime =  time.strftime('%H:%M:%S', time.localtime(self.binance_info['time']))
+            huobitime = time.strftime('%H:%M:%S', time.localtime(self.huobi_info['time']))
             sub_ptime = self.p_info['time'] - nowtime
-            sub_ytime = self.y_info['time'] - nowtime
-            sub_ktime = self.k_info['time'] - nowtime
-            sub_binancetime = self.binance_info['time'] - nowtime
-
+            #sub_ytime = self.y_info['time'] - nowtime
+            #sub_ktime = self.k_info['time'] - nowtime
+            #sub_binancetime = self.binance_info['time'] - nowtime
+            sub_huobitime = self.huobi_info['time'] - nowtime
 
             stdscr.addstr(pos_x,pos_y,time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(nowtime) ), curses.color_pair(3))
             pos_x += 1
 
-            time_comp = ' P:%.2fs|K:%.2f|Y:%.2f|Binance:%.2f'%(sub_ptime, sub_ktime, sub_ytime, sub_binancetime)
-            alltime_info = 'P:'+ptime + '|K:' + ktime + '|Y:'+ytime + '|Binance:'+binancetime + time_comp
+            time_comp = ' P:%.2fs|huobi:%.2fs'%(sub_ptime, sub_hubitime)
+            alltime_info = 'P:'+ptime + '|huobi:' + huobitime  + time_comp
             stdscr.addstr(pos_x, pos_y, alltime_info, curses.color_pair(3))
             pos_x += 1
 
-            print_head =  "Symbol \tSub(K-P) \tPercent(K-P) \tSub(Y-P) \tPercent(Y-P) \tSub(Binance-P) \tPercent(Binance-P)"
+            print_head =  "Symbol \tP \thuobi"
             stdscr.addstr(pos_x,pos_y,print_head,curses.color_pair(3))
             pos_x += 1
             
-            all_coin = ('BTC', 'LTC', 'ETH', 'XRP', 'DASH', 'DOGE')
+            all_coin = ('BTC', 'LTC')
     	    #logging.info(alltime_info)
             for coin in all_coin:
                 cur = coin
                 #prt_str = coin + " \t\t%7.2f \t%7.2f \t%7.2f \t%7.2f \t%7.2f \t%7.2f \t%7.2f"%(self.p_info[cur]['last']['price'], self.k_info[cur]['last']['price'],self.k_info[cur]['last']['price']-self.p_info[cur]['last']['price'], (self.k_info[cur]['last']['price']-self.p_info[cur]['last']['price'])*100/self.p_info[cur]['last']['price'], self.y_info[cur]['last']['price'],self.y_info[cur]['last']['price']-self.p_info[cur]['last']['price'], (self.y_info[cur]['last']['price']-self.p_info[cur]['last']['price'])*100/self.p_info[cur]['last']['price'])
-                sub1 = self.p_info[cur]['bid']['price']-self.k_info[cur]['ask']['price']
-                percent1 = sub1*100/self.k_info[cur]['ask']['price']
+                sub1 = self.p_info[cur]['bid']['price']-self.huobi_info[cur]['ask']['price']
+                percent1 = sub1*100/self.huobi_info[cur]['ask']['price']
                 if percent1 < -100 or percent1 > 100:
                     percent1 = -1.00
 
-                if percent1 > 4.0 and cur=='LTC':
-                    logging.info('get sell chance:%.2f,%.2f, %.2f,%.2f'%(self.p_info[cur]['bid']['price'], self.p_info[cur]['bid']['num'],self.k_info[cur]['ask']['price'], percent1))
-                    self.poloniex.sell('LTC', self.p_info[cur]['bid']['price'], self.p_info[cur]['bid']['num'])
+                #if percent1 > 4.0 and cur=='LTC':
+                #    logging.info('get sell chance:%.2f,%.2f, %.2f,%.2f'%(self.p_info[cur]['bid']['price'], self.p_info[cur]['bid']['num'],self.k_info[cur]['ask']['price'], percent1))
+                #    self.poloniex.sell('LTC', self.p_info[cur]['bid']['price'], self.p_info[cur]['bid']['num'])
                 
 
-                sub2 = self.k_info[cur]['bid']['price']-self.p_info[cur]['ask']['price']
+                sub2 = self.huobi_info[cur]['bid']['price']-self.p_info[cur]['ask']['price']
                 percent2 = sub2*100/self.p_info[cur]['ask']['price']
                 if percent2 < -100 or percent2 > 100:
                     percent2 = -1.00
@@ -135,21 +141,18 @@ class auto_monitor(cv.console_view):
                 #if percent2 < -100 or percent2 > 100:
                 #    percent2 = -1.00
 
-                sub3 = self.binance_info[cur]['last']['price']-self.p_info[cur]['last']['price']
-                percent3 =  sub3*100/self.p_info[cur]['last']['price']
-                if percent3 < -100 or percent3 > 100:
-                    percent3 = -1.00
-
-                prt_str = coin + " \t\t%7.2f \t%7.2f \t%7.2f \t%7.2f \t%7.2f \t%7.2f"%(sub1, percent1, sub2,percent2, sub3, percent3)
-                num_str = "\t%7.2f \t%7.2f \t%7.2f \t%7.2f"%(self.p_info[cur]['bid']['num'], self.p_info[cur]['ask']['num'], self.k_info[cur]['bid']['num'], self.k_info[cur]['ask']['num'])
-                prt_str =  re.sub(r'(-1.00)','--\t', prt_str)   
-                #prt_str =  re.sub(r'(-[\d+\.\d]+)','--\t', prt_str)   
+                ptr_str = coin + " \t\t%7.2f \t%7.2f"%(self.p_info[cur]['bid']['price'], self.huobi_info[cur]['bid']['price'])
+                log_str_price = coin + " \t\t%7.2f \t%7.2f \t%7.2f \t%7.2f \t%7.2f \t%7.2f"%(sub1, percent1, sub2,percent2, sub3, percent3)
+                log_str_num = "\t%7.2f \t%7.2f \t%7.2f \t%7.2f"%(self.p_info[cur]['bid']['num'], self.p_info[cur]['ask']['num'], self.huobi_info[cur]['bid']['num'], self.huobi_info[cur]['ask']['num'])
+               
+                ptr_str =  re.sub(r'(-1.00)','--\t', ptr_str)   
+                log_str_price =  re.sub(r'(-1.00)','--\t', log_str_price) 
                 stdscr.addstr(pos_x,pos_y,prt_str,curses.color_pair(3))
                 pos_x += 1
 
-                #log_str = prt_str + num_str
-                #log_str =  re.sub(r'(-1.00)','--', log_str)   
-    	    	#logging.info(log_str)
+                log_str = log_str_price + log_str_num
+                log_str =  re.sub(r'(-1.00)','--', log_str)   
+    	    	logging.info(log_str)
             stdscr.refresh()
             time.sleep(2)
 
@@ -160,8 +163,8 @@ class auto_monitor(cv.console_view):
 	    #curses.cbreak()
 	    curses.curs_set(0)
             #td1 = thread.start_new_thread( start_coin_market,('55',2) )
-            td2 = thread.start_new_thread( self.start_yobit,('5',2) )
-            td6 = thread.start_new_thread( self.start_binance,('9',2) )
+            #td2 = thread.start_new_thread( self.start_yobit,('5',2) )
+            #td6 = thread.start_new_thread( self.start_binance,('9',2) )
             td3 = thread.start_new_thread( self.start_poloniex,('6',2) )
             td4 = thread.start_new_thread( self.start_kraken,('7',2) )
             td5 = thread.start_new_thread( self.start_monitor,('8',2) )
