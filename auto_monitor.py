@@ -168,6 +168,7 @@ class auto_monitor(cv.console_view):
             td3 = thread.start_new_thread( self.start_poloniex,('6',2) )
             td4 = thread.start_new_thread( self.start_kraken,('7',2) )
             td5 = thread.start_new_thread( self.start_monitor,('8',2) )
+            td7 = thread.start_new_thread( self.start_huobi,('9',2) )
             #time.sleep(0.5)
         except KeyboardInterrupt as e:
             #coin_market.stop()
