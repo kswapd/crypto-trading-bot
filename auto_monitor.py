@@ -108,7 +108,7 @@ class auto_monitor(cv.console_view):
             stdscr.addstr(pos_x,pos_y,time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(nowtime) ), curses.color_pair(3))
             pos_x += 1
 
-            time_comp = ' P:%.2fs|huobi:%.2fs'%(sub_ptime, sub_hubitime)
+            time_comp = ' P:%.2fs|huobi:%.2fs'%(sub_ptime, sub_huobitime)
             alltime_info = 'P:'+ptime + '|huobi:' + huobitime  + time_comp
             stdscr.addstr(pos_x, pos_y, alltime_info, curses.color_pair(3))
             pos_x += 1
@@ -116,12 +116,9 @@ class auto_monitor(cv.console_view):
             print_head =  "Symbol \tP \thuobi"
             stdscr.addstr(pos_x,pos_y,print_head,curses.color_pair(3))
             pos_x += 1
-            
-            all_coin = ('BTC', 'LTC')
-    	    #logging.info(alltime_info)
+            all_coin = [ 'LTC']
             for coin in all_coin:
                 cur = coin
-                #prt_str = coin + " \t\t%7.2f \t%7.2f \t%7.2f \t%7.2f \t%7.2f \t%7.2f \t%7.2f"%(self.p_info[cur]['last']['price'], self.k_info[cur]['last']['price'],self.k_info[cur]['last']['price']-self.p_info[cur]['last']['price'], (self.k_info[cur]['last']['price']-self.p_info[cur]['last']['price'])*100/self.p_info[cur]['last']['price'], self.y_info[cur]['last']['price'],self.y_info[cur]['last']['price']-self.p_info[cur]['last']['price'], (self.y_info[cur]['last']['price']-self.p_info[cur]['last']['price'])*100/self.p_info[cur]['last']['price'])
                 sub1 = self.p_info[cur]['bid']['price']-self.huobi_info[cur]['ask']['price']
                 percent1 = sub1*100/self.huobi_info[cur]['ask']['price']
                 if percent1 < -100 or percent1 > 100:
@@ -141,11 +138,11 @@ class auto_monitor(cv.console_view):
                 #if percent2 < -100 or percent2 > 100:
                 #    percent2 = -1.00
 
-                ptr_str = coin + " \t\t%7.2f \t%7.2f"%(self.p_info[cur]['bid']['price'], self.huobi_info[cur]['bid']['price'])
-                log_str_price = coin + " \t\t%7.2f \t%7.2f \t%7.2f \t%7.2f \t%7.2f \t%7.2f"%(sub1, percent1, sub2,percent2, sub3, percent3)
+                prt_str = coin + " \t\t%7.2f \t%7.2f"%(self.p_info[cur]['bid']['price'], self.huobi_info[cur]['bid']['price'])
+                log_str_price = coin + " \t\t%7.2f \t%7.2f \t%7.2f \t%7.2f"%(sub1, percent1, sub2,percent2)
                 log_str_num = "\t%7.2f \t%7.2f \t%7.2f \t%7.2f"%(self.p_info[cur]['bid']['num'], self.p_info[cur]['ask']['num'], self.huobi_info[cur]['bid']['num'], self.huobi_info[cur]['ask']['num'])
                
-                ptr_str =  re.sub(r'(-1.00)','--\t', ptr_str)   
+                prt_str =  re.sub(r'(-1.00)','--\t', prt_str)   
                 log_str_price =  re.sub(r'(-1.00)','--\t', log_str_price) 
                 stdscr.addstr(pos_x,pos_y,prt_str,curses.color_pair(3))
                 pos_x += 1

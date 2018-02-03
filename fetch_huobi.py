@@ -15,7 +15,7 @@ class fetch_huobi(cv.console_view):
         self.is_stop = False
         self.num = 50
         self.pos_y = 2
-        self.target_symbol = ('ltcusdt','222')
+        self.target_symbol = ['ltcusdt']
         #self.coin_url = "https://api.coinmarketcap.com/v1/ticker/?limit=%d"%self.num
         self.base_url_inner = 'https://api.huobipro.com/'
         self.base_url_outer = 'https://api.huobi.pro/'
