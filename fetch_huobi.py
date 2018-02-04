@@ -101,7 +101,9 @@ class fetch_huobi(cv.console_view):
         utc_datetime = datetime.datetime.utcnow()
         utcmsg = utc_datetime.strftime("%Y-%m-%dT%H:%M:%S")
         msg['Timestamp'] = utcmsg#time.strftime("%Y-%m-%dT%H:%M:%S", time.localtime())
-        print(msg['Timestamp'])
+       
+        #msg['Timestamp'] = msg['Timestamp'][0:-2]+'13'
+        #print(msg['Timestamp'])
         msg_Method = 'GET\n'
         msg_Url = 'api.huobi.pro\n'
         msg_Path = '/v1/account/accounts/991115/balance\n'
@@ -110,13 +112,13 @@ class fetch_huobi(cv.console_view):
         #print(message_param)
         message_all = message_head + message_param
 
-        #print(message_all)
+        print(message_all)
         self.balance_url = self.base_url_outer  +  'v1/account/accounts/991115/balance'
         self.cur_balances = {}
         self.send_headers = {}
         signature = base64.b64encode(hmac.new(self.secret, message_all, digestmod=hashlib.sha256).digest())
         req_url = self.balance_url + '?' + 'AccessKeyId='+msg['AccessKeyId']+'&SignatureMethod='+msg['SignatureMethod']+'&SignatureVersion='+ \
-        msg['SignatureVersion']+'&Timestamp='+urllib.quote(msg['Timestamp'])+'&Signature='+signature
+        msg['SignatureVersion']+'&Timestamp='+urllib.quote(msg['Timestamp'])+'&Signature='+urllib.quote(signature)
         print(req_url)
         #print('{:}'.format(self.send_headers))	
         req = urllib2.Request(req_url, headers=self.send_headers)
@@ -129,16 +131,20 @@ class fetch_huobi(cv.console_view):
             res = urllib2.urlopen(req,timeout=5)
             page = res.read()
             json_obj = json.loads(page)
-            #print(json_obj)	
-            #print('{:}'.format(json_obj))	
-            for item in json_obj['data']['list']:
-                if float(item['balance'])>0.000001 and item['type'] != 'frozen':
-                    self.cur_balances[item['currency']] = float(item['balance'])
-            print('{:}'.format(self.cur_balances))
+            #print('{:}'.format(json_obj))
+            if json_obj['data'] is not None:	
+                for item in json_obj['data']['list']:
+                    if float(item['balance'])>0.000001 and item['type'] != 'frozen':
+                        self.cur_balances[item['currency']] = float(item['balance'])
+                print('{:}'.format(self.cur_balances))
+            else:
+                print(json_obj) 
         except Exception,e:
             err = 'Get huobi balance error'
+            print err
             print e
             logging.info(err)
+            logging.info(e)
             time.sleep(1)
 
         logging.info('get balances:'+'{:}'.format(self.cur_balances))
@@ -236,7 +242,7 @@ if __name__ == "__main__":
     info = fetch_huobi()
     try:
         #info.get_open_info()
-        info.get_accounts()
+        #info.get_accounts()
         info.get_balance()
         #info.sell('LTC', 130.0, 0.01)
     except KeyboardInterrupt as e:
