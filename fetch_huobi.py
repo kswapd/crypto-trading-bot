@@ -21,6 +21,7 @@ class fetch_huobi(cv.console_view):
         #self.coin_url = "https://api.coinmarketcap.com/v1/ticker/?limit=%d"%self.num
         self.base_url_inner = 'https://api.huobipro.com/'
         self.base_url_outer = 'https://api.huobi.pro/'
+        self.base_url = self.base_url_inner
         self.trade_base_url ='https://poloniex.com/tradingApi'
         self.order_book_url = 'https://poloniex.com/public?command=returnOrderBook&&currencyPair=all&depth=1'
         self.send_headers = {
@@ -105,7 +106,7 @@ class fetch_huobi(cv.console_view):
         #msg['Timestamp'] = msg['Timestamp'][0:-2]+'13'
         #print(msg['Timestamp'])
         msg_Method = 'GET\n'
-        msg_Url = 'api.huobi.pro\n'
+        msg_Url = self.base_url[8:-1]+'\n'
         msg_Path = '/v1/account/accounts/991115/balance\n'
         message_head = msg_Method+msg_Url+msg_Path
         message_param = urllib.urlencode(msg)
@@ -113,7 +114,7 @@ class fetch_huobi(cv.console_view):
         message_all = message_head + message_param
 
         print(message_all)
-        self.balance_url = self.base_url_outer  +  'v1/account/accounts/991115/balance'
+        self.balance_url = self.base_url  +  'v1/account/accounts/991115/balance'
         self.cur_balances = {}
         self.send_headers = {}
         signature = base64.b64encode(hmac.new(self.secret, message_all, digestmod=hashlib.sha256).digest())
@@ -158,7 +159,7 @@ class fetch_huobi(cv.console_view):
         msg['Timestamp'] = utcmsg#time.strftime("%Y-%m-%dT%H:%M:%S", time.localtime())
         print(msg['Timestamp'])
         msg_Method = 'GET\n'
-        msg_Url = 'api.huobi.pro\n'
+        msg_Url = self.base_url[8:-1]+'\n'
         msg_Path = '/v1/account/accounts\n'
         message_head = msg_Method+msg_Url+msg_Path
         message_param = urllib.urlencode(msg)
@@ -166,7 +167,7 @@ class fetch_huobi(cv.console_view):
         message_all = message_head + message_param
 
         #print(message_all)
-        self.balance_url = self.base_url_outer  +  'v1/account/accounts'
+        self.balance_url = self.base_url  +  'v1/account/accounts'
         self.cur_balances = {}
         self.send_headers = {}
         signature = base64.b64encode(hmac.new(self.secret, message_all, digestmod=hashlib.sha256).digest())
