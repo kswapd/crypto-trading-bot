@@ -21,7 +21,8 @@ class fetch_huobi(cv.console_view):
         #self.coin_url = "https://api.coinmarketcap.com/v1/ticker/?limit=%d"%self.num
         self.base_url_inner = 'https://api.huobipro.com'
         self.base_url_outer = 'https://api.huobi.pro'
-        self.base_url = self.base_url_inner
+        #self.base_url = self.base_url_inner
+        self.base_url = self.base_url_outer
         self.trade_base_url ='https://poloniex.com/tradingApi'
         self.order_book_url = 'https://poloniex.com/public?command=returnOrderBook&&currencyPair=all&depth=1'
         self.send_headers = {
@@ -63,6 +64,7 @@ class fetch_huobi(cv.console_view):
     def sell(self, symbol, price, num):
         logging.info('start sell:%s,%.2f,%.5f'%(symbol, price, num))
         self.get_balance()
+        self.base_url = self.base_url_outer
         sub_path = '/v1/order/orders/place'
         self.send_headers = {
         'Accept': 'application/json',
@@ -88,11 +90,6 @@ class fetch_huobi(cv.console_view):
         message_all = message_head + message_param
         print(message_all)
         self.sell_url = self.base_url  +  sub_path
-        #self.send_headers = {}
-        self.send_headers = {
-        'Accept': 'application/json'
-        
-        }
         signature = base64.b64encode(hmac.new(self.secret, message_all, digestmod=hashlib.sha256).digest())
         signature = signature.decode()
         msg['Signature'] = signature
@@ -182,6 +179,7 @@ class fetch_huobi(cv.console_view):
             logging.info(e)
             time.sleep(1)
     def get_balance(self):
+        self.base_url = self.base_url_inner
         sub_path = '/v1/account/accounts/991115/balance'
         msg = collections.OrderedDict()
         msg['AccessKeyId'] = self.apikey
