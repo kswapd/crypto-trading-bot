@@ -179,8 +179,8 @@ class fetch_huobi(cv.console_view):
             return
         to_buy_num = num
         if self.cur_balances['usdt'] <  to_buy_num*price:
-            to_buy_num = self.cur_balances['buy']/(price)
-            logging.info('not have enough money:%.2f,change buy amount %.2f-->%.2f', self.cur_balances['USDT'], num, to_buy_num)
+            to_buy_num = self.cur_balances['usdt']/(price)
+            logging.info('not have enough money:%.2f,change buy amount %.2f-->%.2f', self.cur_balances['usdt'], num, to_buy_num)
         if to_buy_num*price < 1:
             logging.info('total must > 1, drop this order')
             return
@@ -317,7 +317,7 @@ class fetch_huobi(cv.console_view):
             time.sleep(1)
 
     def get_ticker(self):
-        ticker_url = self.base_url_outer +'market/detail/merged?symbol=ltcusdt'
+        ticker_url = self.base_url_inner +'/market/detail/merged?symbol=ltcusdt'
             #myreq  = {}
             #myreq['command'] = 'returnTicker' 
             #myreq['nonce'] = int(time.time()*1000)
@@ -347,6 +347,7 @@ class fetch_huobi(cv.console_view):
             err = 'Get huobi ticker error'
             logging.info(err)
             logging.info(e)
+            logging.info(ticker_url)
             time.sleep(1)
         
     def get_open_info(self):
@@ -373,6 +374,7 @@ if __name__ == "__main__":
         #info.get_accounts()
         info.get_balance()
         #info.buy('xrp', 0.8, 5)
+        #info.buy('ltc', 150.8, 5)
     except KeyboardInterrupt as e:
         info.stop()
     
