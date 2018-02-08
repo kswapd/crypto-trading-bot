@@ -15,6 +15,7 @@ class fetch_poloniex(cv.console_view):
         self.is_stop = False
         self.num = 50
         self.pos_y = 2
+        self.fee_rate = 0.002
         self.target_symbol = ('USDT_BTC','USDT_LTC','USDT_BCH','USDT_ETH','USDT_XRP', 'USDT_DASH',  'BTC_DOGE')
         self.method = ('depth','ticker','trades', 'info')
         self.trade_list = ('ltc_usd', 'btc_usd', 'eth_usd', 'bcc_usd', 'dash_usd', 'doge_usd') 
@@ -46,7 +47,8 @@ class fetch_poloniex(cv.console_view):
                 'DOGE':{'last':{'price':-1, 'num':-1}, 'bid':{'price':-1, 'num':-1}, 'ask':{'price':-1, 'num':-1}, 'change':-1,'isFrozen':-1}
             }
         self.symbol_info_pair = {'USDT_BTC':'BTC','USDT_LTC':'LTC','USDT_ETH':'ETH','USDT_XRP':'XRP', 'BTC_DOGE':'DOGE', 'USDT_DASH':'DASH'}
-	
+        for key,val in self.symbol_info_pair.items():
+            self.symbol_info_pair_inv[val] = key
     def stop(self):
         self.is_stop = True
         print('stopped')
@@ -67,10 +69,52 @@ class fetch_poloniex(cv.console_view):
 
         self.send_headers = {}
         myreq  = {}
-        myreq['currencyPair'] = 'USDT_LTC'
+        myreq['currencyPair'] = self.symbol_info_pair_inv[symbol]
         myreq['rate'] = price
         myreq['amount'] = to_sell_num
         myreq['command'] = 'sell' 
+        myreq['nonce'] = int(time.time()*1000)
+        post_data = urllib.urlencode(myreq)
+        mysign = hmac.new(self.secret, post_data, hashlib.sha512).hexdigest()
+        self.send_headers['Sign'] = mysign
+        self.send_headers['Key'] = self.apikey
+        req = urllib2.Request(self.trade_base_url,post_data, headers=self.send_headers)
+        try:
+            #res = urllib2.urlopen(req,timeout=5)
+            #page = res.read()
+            #json_obj = json.loads(page)
+
+            ret = requests.post(self.trade_base_url, data=myreq, headers=self.send_headers)
+            json_obj = json.loads(ret.text)
+            logging.info('sell success'+'{:}'.format(json_obj))
+        except Exception,e:
+            err = 'sell at poloniex error'
+            logging.info(err)
+            logging.info(e)
+            time.sleep(1)
+
+
+    def buy(self, symbol, price, num):
+        logging.info('start buy:%s,%.2f,%.5f'%(symbol, price, num))
+        self.get_balance()
+        if(not self.cur_balances.has_key('USDT')):
+            logging.info('not have money usdt, return')
+            return
+        to_buy_num = num
+        if self.cur_balances['USDT'] <  to_sell_num*price:
+            logging.info('not have enough money:%.2f,change buy amount %.2f-->%.2f', self.cur_balances['USDT'], num, to_buy_num)
+            to_buy_num = self.cur_balances['USDT']/(price+price*self.fee_rate)
+        if to_buy_num < 0.0001:
+            to_buy_num = 0.0001
+
+        logging.info('buy amount:%.5f'%to_buy_num)
+
+        self.send_headers = {}
+        myreq  = {}
+        myreq['currencyPair'] = self.symbol_info_pair_inv[symbol]
+        myreq['rate'] = price
+        myreq['amount'] = to_buy_num
+        myreq['command'] = 'buy' 
         myreq['nonce'] = int(time.time()*1000)
         post_data = urllib.urlencode(myreq)
         mysign = hmac.new(self.secret, post_data, hashlib.sha512).hexdigest()
@@ -192,6 +236,7 @@ if __name__ == "__main__":
         #info.get_open_info()
         info.get_balance()
         #info.sell('LTC', 130.0, 0.01)
+        info.buy('XRP', 130.0, 0.01)
     except KeyboardInterrupt as e:
         info.stop()
     
