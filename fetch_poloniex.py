@@ -231,6 +231,11 @@ if __name__ == "__main__":
                     datefmt='%a, %d %b %Y %H:%M:%S',
                     filename='test.log',
                     filemode='w')
+    console = logging.StreamHandler()
+    console.setLevel(logging.INFO)
+    formatter = logging.Formatter('%(asctime)s %(filename)s[line:%(lineno)d] %(levelname)s %(message)s')
+    console.setFormatter(formatter)
+    logging.getLogger('').addHandler(console)
     info = fetch_poloniex()
     try:
         #info.get_open_info()

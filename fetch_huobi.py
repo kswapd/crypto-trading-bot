@@ -64,12 +64,11 @@ class fetch_huobi(cv.console_view):
     def sell(self, symbol, price, num):
         logging.info('start sell:%s,%.2f,%.5f'%(symbol, price, num))
         self.get_balance()
-        self.base_url = self.base_url_outer
+        self.base_url = self.base_url_inner
         sub_path = '/v1/order/orders/place'
         self.send_headers = {
         'Accept': 'application/json',
         'Content-Type':'application/json',
-        'User-Agent': 'Chrome/39.0.2171.71',
         'User-Agent':'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:53.0) Gecko/20100101 Firefox/53.0'
 }
         msg = collections.OrderedDict()
@@ -88,15 +87,15 @@ class fetch_huobi(cv.console_view):
         message_param = urllib.urlencode(msg)
 
         message_all = message_head + message_param
-        print(message_all)
+        #print(message_all)
         self.sell_url = self.base_url  +  sub_path
         signature = base64.b64encode(hmac.new(self.secret, message_all, digestmod=hashlib.sha256).digest())
-        signature = signature.decode()
-        msg['Signature'] = signature
+        #signature = signature.decode()
+        msg['Signature'] = signature.decode()
         #req_url = self.sell_url + '?' + 'AccessKeyId='+msg['AccessKeyId']+'&SignatureMethod='+msg['SignatureMethod']+'&SignatureVersion='+ \
         #msg['SignatureVersion']+'&Timestamp='+urllib.quote(msg['Timestamp'])+'&Signature='+urllib.quote(signature)
         req_url = self.sell_url + '?' + urllib.urlencode(msg)
-        print(req_url)
+        logging.info(req_url)
 
         if(not self.cur_balances.has_key(symbol)):
             logging.info('not get this symbol:%s, return'%symbol)
@@ -111,10 +110,11 @@ class fetch_huobi(cv.console_view):
         logging.info('selling num:%.5f'%to_sell_num)
 
 
-        post_data  = {}
+        #post_data  = {}
+        post_data = collections.OrderedDict()
         post_data['account-id'] = '991115'
-        post_data['amount'] = to_sell_num
-        post_data['price'] = price
+        post_data['amount'] = '%.2f'%to_sell_num
+        post_data['price'] = '%.2f'%price
         post_data['source'] = 'api' 
         post_data['symbol'] = self.trade_info_pair_inv[symbol] #ltcusdt
         post_data['type'] = 'sell-limit'
@@ -123,8 +123,10 @@ class fetch_huobi(cv.console_view):
 
         #req = urllib2.Request(req_url, post_data_enc)
 
+        post_data_dump = json.dumps(post_data)
+        logging.info(post_data_dump)
         try:
-            ret = requests.post(req_url, data=post_data, headers=self.send_headers)
+            ret = requests.post(req_url, data=post_data_dump, headers=self.send_headers)
             json_obj = json.loads(ret.text)
             #res = urllib2.urlopen(req, timeout=5)
             #page = res.read()
@@ -136,45 +138,80 @@ class fetch_huobi(cv.console_view):
             logging.info(err)
             logging.info(e)
             time.sleep(1)
-    def sell2(self, symbol, price, num):
-        logging.info('start sell:%s,%.2f,%.5f'%(symbol, price, num))
+    def buy(self, symbol, price, num):
+        logging.info('start buy:%s,%.2f,%.5f'%(symbol, price, num))
         self.get_balance()
-        if(not self.cur_balances.has_key(symbol)):
-            logging.info('not get this symbol:%s, return'%symbol)
+        self.base_url = self.base_url_inner
+        sub_path = '/v1/order/orders/place'
+        self.send_headers = {
+        'Accept': 'application/json',
+        'Content-Type':'application/json',
+        'User-Agent':'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:53.0) Gecko/20100101 Firefox/53.0'
+}
+        msg = collections.OrderedDict()
+
+        msg['AccessKeyId'] = self.apikey
+        msg['SignatureMethod'] = 'HmacSHA256'
+        msg['SignatureVersion'] = '2'
+        msg['Timestamp'] = datetime.datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%S")
+
+        msg_Method = 'POST\n'
+        msg_Url = self.base_url[8:]+'\n'
+        msg_Path = sub_path + '\n'
+        message_head = msg_Method+msg_Url+msg_Path
+
+
+        message_param = urllib.urlencode(msg)
+
+        message_all = message_head + message_param
+        #print(message_all)
+        self.sell_url = self.base_url  +  sub_path
+        signature = base64.b64encode(hmac.new(self.secret, message_all, digestmod=hashlib.sha256).digest())
+        #signature = signature.decode()
+        msg['Signature'] = signature.decode()
+        #req_url = self.sell_url + '?' + 'AccessKeyId='+msg['AccessKeyId']+'&SignatureMethod='+msg['SignatureMethod']+'&SignatureVersion='+ \
+        #msg['SignatureVersion']+'&Timestamp='+urllib.quote(msg['Timestamp'])+'&Signature='+urllib.quote(signature)
+        req_url = self.sell_url + '?' + urllib.urlencode(msg)
+        logging.info(req_url)
+
+        if(not self.cur_balances.has_key('usdt')):
+            logging.info('not have enough money return')
             return
-        to_sell_num = num
-        if self.cur_balances[symbol] <  to_sell_num:
-            to_sell_num = self.cur_balances[symbol]
-        if to_sell_num > 0.12:
-            to_sell_num = 0.12
-        if to_sell_num < 0.01:
-            to_sell_num = 0.01
-        logging.info('selling num:%.5f'%to_sell_num)
-
-        self.send_headers = {}
-
-        myreq  = {}
-        myreq['currencyPair'] = 'USDT_LTC'
-        myreq['rate'] = price
-        myreq['amount'] = to_sell_num
-        myreq['command'] = 'sell' 
-        myreq['nonce'] = int(time.time()*1000)
-        post_data = urllib.urlencode(myreq)
+        to_buy_num = num
+        if self.cur_balances['usdt'] <  to_buy_num*price:
+            to_buy_num = self.cur_balances['buy']/(price)
+            logging.info('not have enough money:%.2f,change buy amount %.2f-->%.2f', self.cur_balances['USDT'], num, to_buy_num)
+        if to_buy_num*price < 1:
+            logging.info('total must > 1, drop this order')
+            return
+        logging.info('buy amount:%.5f'%to_buy_num)
         
-        mysign = hmac.new(self.secret, post_data, hashlib.sha512).hexdigest()
-        self.send_headers['Sign'] = mysign
-        self.send_headers['Key'] = self.apikey
-        req = urllib2.Request(self.trade_base_url,post_data, headers=self.send_headers)
-        try:
-            res = urllib2.urlopen(req,timeout=5)
-            page = res.read()
-            json_obj = json.loads(page)
 
-            #ret = requests.post(self.trade_base_url, data=myreq, headers=self.send_headers)
-            #json_obj = json.loads(ret.text)
-            logging.info('sell success'+'{:}'.format(json_obj))
+        #post_data  = {}
+        post_data = collections.OrderedDict()
+        post_data['account-id'] = '991115'
+        post_data['amount'] = '%.2f'%to_buy_num
+        post_data['price'] = '%.2f'%price
+        post_data['source'] = 'api' 
+        post_data['symbol'] = self.trade_info_pair_inv[symbol] #ltcusdt
+        post_data['type'] = 'buy-limit'
+
+        post_data_enc = urllib.urlencode(post_data)
+
+        #req = urllib2.Request(req_url, post_data_enc)
+
+        post_data_dump = json.dumps(post_data)
+        logging.info(post_data_dump)
+        try:
+            ret = requests.post(req_url, data=post_data_dump, headers=self.send_headers)
+            json_obj = json.loads(ret.text)
+            #res = urllib2.urlopen(req, timeout=5)
+            #page = res.read()
+            #json_obj = json.loads(page)
+            logging.info('buy success'+'{:}'.format(json_obj))
+         
         except Exception,e:
-            err = 'sell at poloniex error'
+            err = 'buy at huobi error'
             logging.info(err)
             logging.info(e)
             time.sleep(1)
@@ -199,14 +236,13 @@ class fetch_huobi(cv.console_view):
         #print(message_param)
         message_all = message_head + message_param
 
-        print(message_all)
         self.balance_url = self.base_url  +  sub_path
         self.cur_balances = {}
         self.send_headers = {}
         signature = base64.b64encode(hmac.new(self.secret, message_all, digestmod=hashlib.sha256).digest())
         req_url = self.balance_url + '?' + 'AccessKeyId='+msg['AccessKeyId']+'&SignatureMethod='+msg['SignatureMethod']+'&SignatureVersion='+ \
         msg['SignatureVersion']+'&Timestamp='+urllib.quote(msg['Timestamp'])+'&Signature='+urllib.quote(signature)
-        print(req_url)
+        logging.info(req_url)
         #print('{:}'.format(self.send_headers))	
         req = urllib2.Request(req_url, headers=self.send_headers)
         #ret = urllib2.urlopen(urllib2.Request('https://poloniex.com/tradingApi', post_data, headers))
@@ -223,9 +259,9 @@ class fetch_huobi(cv.console_view):
                 for item in json_obj['data']['list']:
                     if float(item['balance'])>0.000001 and item['type'] != 'frozen':
                         self.cur_balances[item['currency']] = float(item['balance'])
-                print('{:}'.format(self.cur_balances))
+                logging.info('{:}'.format(self.cur_balances))
             else:
-                print(json_obj) 
+                logging.info(json_obj) 
         except Exception,e:
             err = 'Get huobi balance error'
             print err
@@ -323,15 +359,20 @@ class fetch_huobi(cv.console_view):
 if __name__ == "__main__":
     logging.basicConfig(level=logging.DEBUG,
                     format='%(asctime)s %(filename)s[line:%(lineno)d] %(levelname)s %(message)s',
-                    datefmt='%a, %d %b %Y %H:%M:%S',
+                    #datefmt='%a, %d %b %Y %H:%M:%S',
                     filename='test.log',
                     filemode='w')
+    console = logging.StreamHandler()
+    console.setLevel(logging.INFO)
+    formatter = logging.Formatter('%(asctime)s %(filename)s[line:%(lineno)d] %(levelname)s %(message)s')
+    console.setFormatter(formatter)
+    logging.getLogger('').addHandler(console)
     info = fetch_huobi()
     try:
         #info.get_open_info()
         #info.get_accounts()
-        #info.get_balance()
-        info.sell('xrp', 0.5, 3)
+        info.get_balance()
+        #info.buy('xrp', 0.8, 5)
     except KeyboardInterrupt as e:
         info.stop()
     
