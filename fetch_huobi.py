@@ -8,7 +8,7 @@ import hmac,hashlib,base64
 import conf
 import console_view as cv
 import logging
-#import requests
+import requests
 import datetime
 import collections
 class fetch_huobi(cv.console_view):
@@ -64,6 +64,12 @@ class fetch_huobi(cv.console_view):
         logging.info('start sell:%s,%.2f,%.5f'%(symbol, price, num))
         self.get_balance()
         sub_path = '/v1/order/orders/place'
+        self.send_headers = {
+        'Accept': 'application/json',
+        'Content-Type':'application/json',
+        'User-Agent': 'Chrome/39.0.2171.71',
+        'User-Agent':'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:53.0) Gecko/20100101 Firefox/53.0'
+}
         msg = collections.OrderedDict()
 
         msg['AccessKeyId'] = self.apikey
@@ -88,6 +94,7 @@ class fetch_huobi(cv.console_view):
         
         }
         signature = base64.b64encode(hmac.new(self.secret, message_all, digestmod=hashlib.sha256).digest())
+        signature = signature.decode()
         
         req_url = self.sell_url + '?' + 'AccessKeyId='+msg['AccessKeyId']+'&SignatureMethod='+msg['SignatureMethod']+'&SignatureVersion='+ \
         msg['SignatureVersion']+'&Timestamp='+urllib.quote(msg['Timestamp'])+'&Signature='+urllib.quote(signature)
@@ -113,6 +120,7 @@ class fetch_huobi(cv.console_view):
         post_data['price'] = price
         post_data['source'] = 'api' 
         post_data['symbol'] = self.trade_info_pair_inv[symbol] #ltcusdt
+        post_data['type'] = 'sell-limit'
 
         post_data_enc = urllib.urlencode(post_data)
 
