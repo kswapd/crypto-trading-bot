@@ -95,10 +95,10 @@ class fetch_huobi(cv.console_view):
         }
         signature = base64.b64encode(hmac.new(self.secret, message_all, digestmod=hashlib.sha256).digest())
         signature = signature.decode()
-        
-        req_url = self.sell_url + '?' + 'AccessKeyId='+msg['AccessKeyId']+'&SignatureMethod='+msg['SignatureMethod']+'&SignatureVersion='+ \
-        msg['SignatureVersion']+'&Timestamp='+urllib.quote(msg['Timestamp'])+'&Signature='+urllib.quote(signature)
-        #req_url = self.balance_url + '?' + 'Signature='+urllib.quote(signature)
+        msg['Signature'] = signature
+        #req_url = self.sell_url + '?' + 'AccessKeyId='+msg['AccessKeyId']+'&SignatureMethod='+msg['SignatureMethod']+'&SignatureVersion='+ \
+        #msg['SignatureVersion']+'&Timestamp='+urllib.quote(msg['Timestamp'])+'&Signature='+urllib.quote(signature)
+        req_url = self.sell_url + '?' + urllib.urlencode(msg)
         print(req_url)
 
         if(not self.cur_balances.has_key(symbol)):
