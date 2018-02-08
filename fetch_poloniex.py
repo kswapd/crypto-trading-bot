@@ -15,7 +15,7 @@ class fetch_poloniex(cv.console_view):
         self.is_stop = False
         self.num = 50
         self.pos_y = 2
-        self.fee_rate = 0.002
+        self.fee_rate = 0.0025
         self.target_symbol = ('USDT_BTC','USDT_LTC','USDT_BCH','USDT_ETH','USDT_XRP', 'USDT_DASH',  'BTC_DOGE')
         self.method = ('depth','ticker','trades', 'info')
         self.trade_list = ('ltc_usd', 'btc_usd', 'eth_usd', 'bcc_usd', 'dash_usd', 'doge_usd') 
@@ -47,6 +47,7 @@ class fetch_poloniex(cv.console_view):
                 'DOGE':{'last':{'price':-1, 'num':-1}, 'bid':{'price':-1, 'num':-1}, 'ask':{'price':-1, 'num':-1}, 'change':-1,'isFrozen':-1}
             }
         self.symbol_info_pair = {'USDT_BTC':'BTC','USDT_LTC':'LTC','USDT_ETH':'ETH','USDT_XRP':'XRP', 'BTC_DOGE':'DOGE', 'USDT_DASH':'DASH'}
+        self.symbol_info_pair_inv = {}
         for key,val in self.symbol_info_pair.items():
             self.symbol_info_pair_inv[val] = key
     def stop(self):
@@ -61,10 +62,9 @@ class fetch_poloniex(cv.console_view):
         to_sell_num = num
         if self.cur_balances[symbol] <  to_sell_num:
             to_sell_num = self.cur_balances[symbol]
-        if to_sell_num > 0.12:
-            to_sell_num = 0.12
-        if to_sell_num < 0.01:
-            to_sell_num = 0.01
+        if to_sell_num*price < 1:
+            logging.info('total must > 1, drop this order')
+            return
         logging.info('selling num:%.5f'%to_sell_num)
 
         self.send_headers = {}
@@ -101,12 +101,12 @@ class fetch_poloniex(cv.console_view):
             logging.info('not have money usdt, return')
             return
         to_buy_num = num
-        if self.cur_balances['USDT'] <  to_sell_num*price:
+        if self.cur_balances['USDT'] <  to_buy_num*price:
+            to_buy_num = self.cur_balances['USDT']/(price)
             logging.info('not have enough money:%.2f,change buy amount %.2f-->%.2f', self.cur_balances['USDT'], num, to_buy_num)
-            to_buy_num = self.cur_balances['USDT']/(price+price*self.fee_rate)
-        if to_buy_num < 0.0001:
-            to_buy_num = 0.0001
-
+        if to_buy_num*price < 1:
+            logging.info('total must > 1, drop this order')
+            return
         logging.info('buy amount:%.5f'%to_buy_num)
 
         self.send_headers = {}
@@ -128,7 +128,7 @@ class fetch_poloniex(cv.console_view):
 
             ret = requests.post(self.trade_base_url, data=myreq, headers=self.send_headers)
             json_obj = json.loads(ret.text)
-            logging.info('sell success'+'{:}'.format(json_obj))
+            logging.info('buy success'+'{:}'.format(json_obj))
         except Exception,e:
             err = 'sell at poloniex error'
             logging.info(err)
@@ -236,7 +236,7 @@ if __name__ == "__main__":
         #info.get_open_info()
         info.get_balance()
         #info.sell('LTC', 130.0, 0.01)
-        info.buy('XRP', 130.0, 0.01)
+        #info.buy('XRP', 0.75, 1.5)
     except KeyboardInterrupt as e:
         info.stop()
     
