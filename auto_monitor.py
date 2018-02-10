@@ -160,8 +160,8 @@ class auto_monitor(cv.console_view):
 
 
                 prt_str = coin + " \t\t%7.2f \t%7.2f"%(pbp, hbp)
-                log_str_price = coin + ",%7.2f,%7.2f,%7.2f,%7.2f"%(sub1, percent1, sub2,percent2)
-                log_str_num = ",%7.2f,%7.2f,%7.2f,%7.2f"%(pbn, han, hbn, pan)
+                log_str_price = coin + ",%.2f,%.2f,%.2f,%.2f"%(sub1, percent1, sub2,percent2)
+                log_str_num = ",%.2f,%.2f,%72f,%.2f"%(pbn, han, hbn, pan)
                
                 prt_str =  re.sub(r'(-1.00)','--\t', prt_str)   
         
