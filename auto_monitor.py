@@ -119,16 +119,22 @@ class auto_monitor(cv.console_view):
             all_coin = [ 'LTC']
             for coin in all_coin:
                 cur = coin
-                sub1 = self.p_info[cur]['bid']['price']-self.huobi_info[cur]['ask']['price']
-                percent1 = sub1*100/self.huobi_info[cur]['ask']['price']
+
+                pbp = self.p_info[cur]['bid']['price']
+                pbn = self.p_info[cur]['bid']['num']
+                hap = self.huobi_info[cur]['ask']['price']
+                han = self.huobi_info[cur]['ask']['num']
+                sub1 = pbp - hap
+                percent1 = sub1*100/hap
                 if percent1 < -100 or percent1 > 100:
                     percent1 = -1.00
 
                 if percent1 > 1.0 and cur=='LTC':
-                    logging.info('get chance:%.2f,%.2f, %.2f,%.2f, %.2f'%(self.p_info[cur]['bid']['price'], self.p_info[cur]['bid']['num'],self.huobi_info[cur]['ask']['price'],self.huobi_info[cur]['ask']['num'], percent1))
-                    trade_num =  self.p_info[cur]['bid']['num'] if  self.p_info[cur]['bid']['num'] < self.huobi_info[cur]['ask']['num'] else self.huobi_info[cur]['ask']['num']
-                    self.poloniex.sell('LTC', self.p_info[cur]['bid']['price'], trade_num)
-                    self.huobi.buy('ltc', self.huobi_info[cur]['ask']['price'], trade_num)
+                    
+                    logging.info('get chance:%.2f,%.2f, %.2f,%.2f, %.2f'%(pbp, pbn,hap,han, percent1))
+                    trade_num =  pbn if  pbn < han else han
+                    self.poloniex.sell('LTC', pbp, trade_num)
+                    self.huobi.buy('ltc', hap trade_num)
                 
 
                 sub2 = self.huobi_info[cur]['bid']['price']-self.p_info[cur]['ask']['price']
