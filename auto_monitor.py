@@ -124,9 +124,9 @@ class auto_monitor(cv.console_view):
                 if percent1 < -100 or percent1 > 100:
                     percent1 = -1.00
 
-                if percent1 > 1.2 and cur=='LTC':
-                    logging.info('get chance:%.2f,%.2f, %.2f,%.2f, %.2f'%(self.p_info[cur]['bid']['price'], self.p_info[cur]['bid']['num'],self.huobi_info[cur]['ask']['price'],self.huobi_info['ask']['num'], percent1))
-                    trade_num =  self.p_info[cur]['bid']['num'] if  self.p_info[cur]['bid']['num'] < self.huobi_info['ask']['num'] else self.huobi_info['ask']['num']
+                if percent1 > 1.0 and cur=='LTC':
+                    logging.info('get chance:%.2f,%.2f, %.2f,%.2f, %.2f'%(self.p_info[cur]['bid']['price'], self.p_info[cur]['bid']['num'],self.huobi_info[cur]['ask']['price'],self.huobi_info[cur]['ask']['num'], percent1))
+                    trade_num =  self.p_info[cur]['bid']['num'] if  self.p_info[cur]['bid']['num'] < self.huobi_info[cur]['ask']['num'] else self.huobi_info[cur]['ask']['num']
                     self.poloniex.sell('LTC', self.p_info[cur]['bid']['price'], trade_num)
                     self.huobi.buy('ltc', self.huobi_info[cur]['ask']['price'], trade_num)
                 
