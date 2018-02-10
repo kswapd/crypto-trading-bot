@@ -122,8 +122,18 @@ class auto_monitor(cv.console_view):
 
                 pbp = self.p_info[cur]['bid']['price']
                 pbn = self.p_info[cur]['bid']['num']
+
+                pap = self.p_info[cur]['ask']['price']
+                pan = self.p_info[cur]['ask']['num']
+
                 hap = self.huobi_info[cur]['ask']['price']
                 han = self.huobi_info[cur]['ask']['num']
+
+                hbp = self.huobi_info[cur]['bid']['price']
+                hbn = self.huobi_info[cur]['bid']['num']
+
+
+
                 sub1 = pbp - hap
                 percent1 = sub1*100/hap
                 if percent1 < -100 or percent1 > 100:
@@ -134,24 +144,27 @@ class auto_monitor(cv.console_view):
                     logging.info('get chance:%.2f,%.2f, %.2f,%.2f, %.2f'%(pbp, pbn,hap,han, percent1))
                     trade_num =  pbn if  pbn < han else han
                     self.poloniex.sell('LTC', pbp, trade_num)
-                    self.huobi.buy('ltc', hap trade_num)
+                    self.huobi.buy('ltc', hap, trade_num)
                 
 
-                sub2 = self.huobi_info[cur]['bid']['price']-self.p_info[cur]['ask']['price']
-                percent2 = sub2*100/self.p_info[cur]['ask']['price']
+                sub2 = hbp - pap
+                percent2 = sub2*100/pap
                 if percent2 < -100 or percent2 > 100:
                     percent2 = -1.00
-                #sub2 = self.y_info[cur]['last']['price']-self.p_info[cur]['last']['price']
-                #percent2 =  sub2*100/self.p_info[cur]['last']['price']
-                #if percent2 < -100 or percent2 > 100:
-                #    percent2 = -1.00
+                if percent2 > 1.0 and cur == 'LTC':
+                    logging.info('get chance2:%.2f,%.2f, %.2f,%.2f, %.2f'%(hbp, hbn,pap,pan, percent2))
 
-                prt_str = coin + " \t\t%7.2f \t%7.2f"%(self.p_info[cur]['bid']['price'], self.huobi_info[cur]['bid']['price'])
-                log_str_price = coin + " \t\t%7.2f \t%7.2f \t%7.2f \t%7.2f"%(sub1, percent1, sub2,percent2)
-                log_str_num = "\t%7.2f \t%7.2f \t%7.2f \t%7.2f"%(self.p_info[cur]['bid']['num'], self.p_info[cur]['ask']['num'], self.huobi_info[cur]['bid']['num'], self.huobi_info[cur]['ask']['num'])
+                    trade_num2 = hbn if hbn < pan else pan
+                    self.huobi.sell('ltc', hbp, trade_num2)
+                    self.poloniex.buy('LTC', pap, trade_num2)
+
+
+                prt_str = coin + " \t\t%7.2f \t%7.2f"%(pbp, hbp)
+                log_str_price = coin + ",%7.2f,%7.2f,%7.2f,%7.2f"%(sub1, percent1, sub2,percent2)
+                log_str_num = ",%7.2f,%7.2f,%7.2f,%7.2f"%(pbn, han, hbn, pan)
                
                 prt_str =  re.sub(r'(-1.00)','--\t', prt_str)   
-                log_str_price =  re.sub(r'(-1.00)','--\t', log_str_price) 
+        
                 stdscr.addstr(pos_x,pos_y,prt_str,curses.color_pair(3))
                 pos_x += 1
 
