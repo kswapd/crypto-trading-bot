@@ -7,7 +7,7 @@ import curses
 import logging
 import console_view as cv
 import conf,hmac,hashlib,base64
-import requests
+import request
 class fetch_kraken(cv.console_view):
     def __init__(self, x = 80, y = 16, width = 80, height = 15, is_view = True):
         cv.console_view.__init__(self, x, y, width, height, is_view)
@@ -146,6 +146,60 @@ class fetch_kraken(cv.console_view):
             logging.info(e)
             time.sleep(1)
 
+    def sell(self, symbol, price, num):
+        logging.info('start sell:%s,%.2f,%.5f'%(symbol, price, num))
+   
+        url_path = '/' + self.api_version + '/private/'+'AddOrder'
+        req_url = self.api_url + url_path
+        
+        self.get_balance()
+
+        if(not self.cur_balances.has_key(symbol)):
+            logging.info('not get this symbol:%s, return'%symbol)
+            return
+        to_sell_num = num
+        if self.cur_balances[symbol] <  to_sell_num:
+            to_sell_num = self.cur_balances[symbol]
+        if to_sell_num*price < 1:
+            logging.info('total must > 1, drop this order')
+            return
+        logging.info('selling num:%.5f'%to_sell_num)
+
+    
+        self.send_headers = {}
+        myreq  = {}
+        myreq['pair'] = self.symbol_info_pair_inv[symbol]
+        myreq['type'] = 'sell' 
+        myreq['ordertype'] = 'limit' 
+        myreq['price'] = price
+        myreq['volume'] = to_sell_num
+        
+        myreq['nonce'] = int(time.time()*1000)
+
+        post_data = urllib.urlencode(myreq)
+        
+        message = url_path + hashlib.sha256(str(myreq['nonce']) +
+                                           post_data).digest()
+        signature = hmac.new(base64.b64decode(self.secret),
+                             message, hashlib.sha512)
+        self.send_headers['API-Key'] = self.apikey
+        self.send_headers['API-Sign'] = base64.b64encode(signature.digest())
+
+        
+        #req = urllib2.Request(self.trade_base_url,post_data, headers=self.send_headers)
+        try:
+            #res = urllib2.urlopen(req,timeout=5)
+            #page = res.read()
+            #json_obj = json.loads(page)
+
+            ret = requests.post(req_url, data=myreq, headers=self.send_headers)
+            json_obj = json.loads(ret.text)
+            logging.info('buy success'+'{:}'.format(json_obj))
+        except Exception,e:
+            err = 'buy at kraken error'
+            logging.info(err)
+            logging.info(e)
+            time.sleep(1)
     def get_open_info(self):
         while not self.is_stop:
             #self.get_ticker()
@@ -200,7 +254,7 @@ if __name__ == "__main__":
     try:
         #info.get_open_info()
         #info.get_balance()
-        info.buy('LTC', 30.0, 0.1)
+        info.sell('LTC', 530.0, 0.1)
         #info.buy('XRP', 0.75, 1.5)
     except KeyboardInterrupt as e:
         info.stop()
