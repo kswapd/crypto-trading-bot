@@ -130,7 +130,7 @@ class fetch_poloniex(cv.console_view):
             json_obj = json.loads(ret.text)
             logging.info('buy success'+'{:}'.format(json_obj))
         except Exception,e:
-            err = 'sell at poloniex error'
+            err = 'buy at poloniex error'
             logging.info(err)
             logging.info(e)
             time.sleep(1)

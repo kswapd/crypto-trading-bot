@@ -7,6 +7,7 @@ import curses
 import logging
 import console_view as cv
 import conf,hmac,hashlib,base64
+import requests
 class fetch_kraken(cv.console_view):
     def __init__(self, x = 80, y = 16, width = 80, height = 15, is_view = True):
         cv.console_view.__init__(self, x, y, width, height, is_view)
@@ -36,18 +37,20 @@ class fetch_kraken(cv.console_view):
                 'DOGE':{'last':{'price':-1, 'num':-1}, 'bid':{'price':-1, 'num':-1}, 'ask':{'price':-1, 'num':-1}}
             }
         self.symbol_info_pair = {'XXBTZUSD':'BTC','XLTCZUSD':'LTC','XETHZUSD':'ETH','XXRPZUSD':'XRP', 'DASHUSD':'DASH'}
-
+        self.symbol_info_pair_inv = {}
+        for key,val in self.symbol_info_pair.items():
+            self.symbol_info_pair_inv[val] = key   
 
         keys_conf = conf.TradeKeys()
         self.cur_balances = {}
         self.apikey = keys_conf.keys_info['kraken']['public']
         self.secret = keys_conf.keys_info['kraken']['secret']
-
+    
     def stop(self):
         self.is_stop = True
         print('stopped')
 
-
+    
     def get_balance(self):
         self.cur_balances = {}
         self.send_headers = {}
@@ -62,15 +65,6 @@ class fetch_kraken(cv.console_view):
                                            post_data).digest()
         signature = hmac.new(base64.b64decode(self.secret),
                              message, hashlib.sha512)
-        #headers = {
-        #    'API-Key': self.key,
-        #    'API-Sign': base64.b64encode(signature.digest())
-        #}
-
-        
-
-        #print (self.secret, self.apikey)
-        #mysign = hmac.new(self.secret, post_data, hashlib.sha512).hexdigest()
         self.send_headers['API-Key'] = self.apikey
         self.send_headers['API-Sign'] = base64.b64encode(signature.digest())
         
@@ -99,11 +93,63 @@ class fetch_kraken(cv.console_view):
 
         logging.info('get balances:'+'{:}'.format(self.cur_balances))
 
+    def buy(self, symbol, price, num):
+        law_coin = {'USDT':'ZUSD'}
+        url_path = '/' + self.api_version + '/private/'+'AddOrder'
+        req_url = self.api_url + url_path
+        logging.info('start buy:%s,%.2f,%.5f'%(symbol, price, num))
+        self.get_balance()
+        if(not self.cur_balances.has_key(law_coin['USDT'])):
+            logging.info('not have money usdt, return')
+            return
+        to_buy_num = num
+        #if self.cur_balances[law_coin['USDT']] <  to_buy_num*price:
+         #   to_buy_num = self.cur_balances[law_coin['USDT']]/(price)
+        #    logging.info('not have enough money:%.2f,change buy amount %.2f-->%.2f', self.cur_balances[law_coin['USDT']], num, to_buy_num)
+        if to_buy_num*price < 1:
+            logging.info('total must > 1, drop this order')
+            return
+        logging.info('buy amount:%.5f'%to_buy_num)
+
+        self.send_headers = {}
+        myreq  = {}
+        myreq['pair'] = self.symbol_info_pair_inv[symbol]
+        myreq['type'] = 'buy' 
+        myreq['ordertype'] = 'limit' 
+        myreq['price'] = price
+        myreq['volume'] = to_buy_num
+        
+        myreq['nonce'] = int(time.time()*1000)
+
+        post_data = urllib.urlencode(myreq)
+        
+        message = url_path + hashlib.sha256(str(myreq['nonce']) +
+                                           post_data).digest()
+        signature = hmac.new(base64.b64decode(self.secret),
+                             message, hashlib.sha512)
+        self.send_headers['API-Key'] = self.apikey
+        self.send_headers['API-Sign'] = base64.b64encode(signature.digest())
+
+        
+        #req = urllib2.Request(self.trade_base_url,post_data, headers=self.send_headers)
+        try:
+            #res = urllib2.urlopen(req,timeout=5)
+            #page = res.read()
+            #json_obj = json.loads(page)
+
+            ret = requests.post(req_url, data=myreq, headers=self.send_headers)
+            json_obj = json.loads(ret.text)
+            logging.info('buy success'+'{:}'.format(json_obj))
+        except Exception,e:
+            err = 'buy at kraken error'
+            logging.info(err)
+            logging.info(e)
+            time.sleep(1)
 
     def get_open_info(self):
         while not self.is_stop:
-            self.get_ticker()
-            #self.get_order_book()
+            #self.get_ticker()
+            self.get_order_book()
             time.sleep(2)
     def get_ticker(self):
         ticker_url = self.base_url+','.join(self.trade_list)
@@ -153,7 +199,9 @@ if __name__ == "__main__":
     info = fetch_kraken()
     try:
         #info.get_open_info()
-        info.get_balance()
+        #info.get_balance()
+        info.buy('LTC', 30.0, 0.1)
+        #info.buy('XRP', 0.75, 1.5)
     except KeyboardInterrupt as e:
         info.stop()
     

@@ -83,7 +83,7 @@ class auto_monitor(cv.console_view):
         curses.init_pair(3, curses.COLOR_YELLOW, curses.COLOR_BLACK)
         while True:
             self.p_info = self.poloniex.monitor_info
-            #self.k_info = self.kraken.monitor_info
+            self.k_info = self.kraken.monitor_info
             #self.y_info = self.yobit.monitor_info
             #self.binance_info = self.binance.monitor_info
             self.huobi_info = self.huobi.monitor_info
