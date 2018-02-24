@@ -1,11 +1,12 @@
 #! /usr/bin/python
 #-*-coding:utf-8-*- 
-import urllib2
+import urllib,urllib2
 import json
 import sys, time
 import curses
 import logging
 import console_view as cv
+import conf,hmac,hashlib,base64
 class fetch_kraken(cv.console_view):
     def __init__(self, x = 80, y = 16, width = 80, height = 15, is_view = True):
         cv.console_view.__init__(self, x, y, width, height, is_view)
@@ -18,6 +19,8 @@ class fetch_kraken(cv.console_view):
         #self.coin_url = "https://api.coinmarketcap.com/v1/ticker/?limit=%d"%self.num
         self.base_url = 'https://api.kraken.com/0/public/Ticker?pair='
         self.order_book_url = 'https://api.kraken.com/0/public/Depth?count=1&pair='
+        self.api_url = 'https://api.kraken.com'
+        self.api_version = '0'
         self.send_headers = {
  'Accept':'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
  'User-Agent':'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/63.0.3239.132 Safari/537.36',
@@ -33,9 +36,69 @@ class fetch_kraken(cv.console_view):
                 'DOGE':{'last':{'price':-1, 'num':-1}, 'bid':{'price':-1, 'num':-1}, 'ask':{'price':-1, 'num':-1}}
             }
         self.symbol_info_pair = {'XXBTZUSD':'BTC','XLTCZUSD':'LTC','XETHZUSD':'ETH','XXRPZUSD':'XRP', 'DASHUSD':'DASH'}
+
+
+        keys_conf = conf.TradeKeys()
+        self.cur_balances = {}
+        self.apikey = keys_conf.keys_info['kraken']['public']
+        self.secret = keys_conf.keys_info['kraken']['secret']
+
     def stop(self):
         self.is_stop = True
         print('stopped')
+
+
+    def get_balance(self):
+        self.cur_balances = {}
+        self.send_headers = {}
+        url_path = '/' + self.api_version + '/private/'+'Balance'
+        req_url = self.api_url + url_path
+
+        myreq  = {}
+        myreq['nonce'] = int(time.time()*1000)
+        post_data = urllib.urlencode(myreq)
+        
+        message = url_path + hashlib.sha256(str(myreq['nonce']) +
+                                           post_data).digest()
+        signature = hmac.new(base64.b64decode(self.secret),
+                             message, hashlib.sha512)
+        #headers = {
+        #    'API-Key': self.key,
+        #    'API-Sign': base64.b64encode(signature.digest())
+        #}
+
+        
+
+        #print (self.secret, self.apikey)
+        #mysign = hmac.new(self.secret, post_data, hashlib.sha512).hexdigest()
+        self.send_headers['API-Key'] = self.apikey
+        self.send_headers['API-Sign'] = base64.b64encode(signature.digest())
+        
+        #print('{:}'.format(self.send_headers)) 
+        req = urllib2.Request(req_url,post_data, headers=self.send_headers)
+        #ret = urllib2.urlopen(urllib2.Request('https://poloniex.com/tradingApi', post_data, headers))
+            #elf.send_headers['Key'] = self.apikey
+            #    'Sign': mysign,
+            #    'Key': self.apikey
+            #}
+        try:
+            res = urllib2.urlopen(req,timeout=5)
+            page = res.read()
+            json_obj = json.loads(page)
+            #print(json_obj['SDC']) 
+            print('{:}'.format(json_obj))  
+            for (k,v) in json_obj['result'].items():
+                if float(v)>0.000001:
+                    print (k,v)
+                    self.cur_balances[k] = float(v)
+        except Exception,e:
+            err = 'Get kraken balance error'
+            print e
+            logging.info(err)
+            time.sleep(1)
+
+        logging.info('get balances:'+'{:}'.format(self.cur_balances))
+
 
     def get_open_info(self):
         while not self.is_stop:
@@ -89,7 +152,8 @@ if __name__ == "__main__":
                     filemode='w')
     info = fetch_kraken()
     try:
-        info.get_open_info()
+        #info.get_open_info()
+        info.get_balance()
     except KeyboardInterrupt as e:
         info.stop()
     
