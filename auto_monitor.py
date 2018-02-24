@@ -95,21 +95,21 @@ class auto_monitor(cv.console_view):
             pos_x += 1
             nowtime = time.time()
             ptime =  time.strftime('%H:%M:%S', time.localtime(self.p_info['time']))
-            #ktime =  time.strftime('%H:%M:%S', time.localtime(self.k_info['time']))
+            ktime =  time.strftime('%H:%M:%S', time.localtime(self.k_info['time']))
             #ytime =  time.strftime('%H:%M:%S', time.localtime(self.y_info['time']))
             #binancetime =  time.strftime('%H:%M:%S', time.localtime(self.binance_info['time']))
             huobitime = time.strftime('%H:%M:%S', time.localtime(self.huobi_info['time']))
             sub_ptime = self.p_info['time'] - nowtime
             #sub_ytime = self.y_info['time'] - nowtime
-            #sub_ktime = self.k_info['time'] - nowtime
+            sub_ktime = self.k_info['time'] - nowtime
             #sub_binancetime = self.binance_info['time'] - nowtime
             sub_huobitime = self.huobi_info['time'] - nowtime
 
             stdscr.addstr(pos_x,pos_y,time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(nowtime) ), curses.color_pair(3))
             pos_x += 1
 
-            time_comp = ' P:%.2fs|huobi:%.2fs'%(sub_ptime, sub_huobitime)
-            alltime_info = 'P:'+ptime + '|huobi:' + huobitime  + time_comp
+            time_comp = ' P:%.2fs|huobi:%.2fs|K:%.2fs'%(sub_ptime, sub_huobitime, sub_ktime)
+            alltime_info = 'P:'+ptime + '|huobi:' + huobitime  +'|K:'+ktime + time_comp
             stdscr.addstr(pos_x, pos_y, alltime_info, curses.color_pair(3))
             pos_x += 1
 
@@ -119,6 +119,7 @@ class auto_monitor(cv.console_view):
             all_coin = [ 'LTC']
             for coin in all_coin:
                 cur = coin
+                #print('{:}'.format(self.k_info[cur]))
 
                 pbp = self.p_info[cur]['bid']['price']
                 pbn = self.p_info[cur]['bid']['num']
@@ -132,6 +133,10 @@ class auto_monitor(cv.console_view):
                 hbp = self.huobi_info[cur]['bid']['price']
                 hbn = self.huobi_info[cur]['bid']['num']
 
+                kbp = self.k_info[cur]['bid']['price']
+                kbn = self.k_info[cur]['bid']['num']
+                kap = self.k_info[cur]['ask']['price']
+                kan = self.k_info[cur]['ask']['num']
 
 
                 sub1 = pbp - hap
@@ -161,7 +166,7 @@ class auto_monitor(cv.console_view):
 
                 prt_str = coin + " \t\t%7.2f \t%7.2f"%(pbp, hbp)
                 log_str_price = coin + ",%.2f,%.2f,%.2f,%.2f"%(sub1, percent1, sub2,percent2)
-                log_str_num = ",%.2f,%.2f,%72f,%.2f"%(pbn, han, hbn, pan)
+                log_str_num = ",%.2f,%.2f,%.2f,%.2f"%(pbn, han, hbn, pan)
                
                 prt_str =  re.sub(r'(-1.00)','--\t', prt_str)   
         
@@ -184,7 +189,7 @@ class auto_monitor(cv.console_view):
             #td2 = thread.start_new_thread( self.start_yobit,('5',2) )
             #td6 = thread.start_new_thread( self.start_binance,('9',2) )
             td3 = thread.start_new_thread( self.start_poloniex,('6',2) )
-            #td4 = thread.start_new_thread( self.start_kraken,('7',2) )
+            td4 = thread.start_new_thread( self.start_kraken,('7',2) )
             td5 = thread.start_new_thread( self.start_monitor,('8',2) )
             td7 = thread.start_new_thread( self.start_huobi,('9',2) )
             #time.sleep(0.5)
