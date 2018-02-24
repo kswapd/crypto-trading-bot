@@ -91,13 +91,11 @@ class auto_monitor(cv.console_view):
             pos_x = 2
             pos_y = 2
             stdscr.box(curses.ACS_VLINE, curses.ACS_HLINE)
-            stdscr.addstr(pos_x,pos_y,'Cryptocurrency exchange Monitor', curses.color_pair(3))
+            #stdscr.addstr(pos_x,pos_y,'Cryptocurrency exchange Monitor', curses.color_pair(3))
             pos_x += 1
             nowtime = time.time()
             ptime =  time.strftime('%H:%M:%S', time.localtime(self.p_info['time']))
             ktime =  time.strftime('%H:%M:%S', time.localtime(self.k_info['time']))
-            #ytime =  time.strftime('%H:%M:%S', time.localtime(self.y_info['time']))
-            #binancetime =  time.strftime('%H:%M:%S', time.localtime(self.binance_info['time']))
             huobitime = time.strftime('%H:%M:%S', time.localtime(self.huobi_info['time']))
             sub_ptime = self.p_info['time'] - nowtime
             #sub_ytime = self.y_info['time'] - nowtime
@@ -105,16 +103,16 @@ class auto_monitor(cv.console_view):
             #sub_binancetime = self.binance_info['time'] - nowtime
             sub_huobitime = self.huobi_info['time'] - nowtime
 
-            stdscr.addstr(pos_x,pos_y,time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(nowtime) ), curses.color_pair(3))
+            #stdscr.addstr(pos_x,pos_y,time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(nowtime) ), curses.color_pair(3))
             pos_x += 1
 
             time_comp = ' P:%.2fs|huobi:%.2fs|K:%.2fs'%(sub_ptime, sub_huobitime, sub_ktime)
             alltime_info = 'P:'+ptime + '|huobi:' + huobitime  +'|K:'+ktime + time_comp
-            stdscr.addstr(pos_x, pos_y, alltime_info, curses.color_pair(3))
+            #stdscr.addstr(pos_x, pos_y, alltime_info, curses.color_pair(3))
             pos_x += 1
 
             print_head =  "Symbol \tP \thuobi"
-            stdscr.addstr(pos_x,pos_y,print_head,curses.color_pair(3))
+            #stdscr.addstr(pos_x,pos_y,print_head,curses.color_pair(3))
             pos_x += 1
             all_coin = [ 'LTC']
             for coin in all_coin:
@@ -242,13 +240,13 @@ class auto_monitor(cv.console_view):
                
                 prt_str =  re.sub(r'(-1.00)','--\t', prt_str)   
         
-                stdscr.addstr(pos_x,pos_y,prt_str,curses.color_pair(3))
+                #stdscr.addstr(pos_x,pos_y,prt_str,curses.color_pair(3))
                 pos_x += 1
 
-                log_str = log_str_price + log_str_num
+                log_str = log_str_price
                 log_str =  re.sub(r'(-1.00)','--', log_str)   
     	    	logging.info(log_str)
-            stdscr.refresh()
+            #stdscr.refresh()
             time.sleep(2)
 
     def start(self):
