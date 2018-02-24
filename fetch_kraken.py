@@ -7,7 +7,7 @@ import curses
 import logging
 import console_view as cv
 import conf,hmac,hashlib,base64
-import request
+import requests
 class fetch_kraken(cv.console_view):
     def __init__(self, x = 80, y = 16, width = 80, height = 15, is_view = True):
         cv.console_view.__init__(self, x, y, width, height, is_view)
@@ -103,9 +103,9 @@ class fetch_kraken(cv.console_view):
             logging.info('not have money usdt, return')
             return
         to_buy_num = num
-        #if self.cur_balances[law_coin['USDT']] <  to_buy_num*price:
-         #   to_buy_num = self.cur_balances[law_coin['USDT']]/(price)
-        #    logging.info('not have enough money:%.2f,change buy amount %.2f-->%.2f', self.cur_balances[law_coin['USDT']], num, to_buy_num)
+        if self.cur_balances[law_coin['USDT']] <  to_buy_num*price:
+            to_buy_num = self.cur_balances[law_coin['USDT']]/(price)
+            logging.info('not have enough money:%.2f,change buy amount %.2f-->%.2f', self.cur_balances[law_coin['USDT']], num, to_buy_num)
         if to_buy_num*price < 1:
             logging.info('total must > 1, drop this order')
             return
@@ -153,11 +153,10 @@ class fetch_kraken(cv.console_view):
         req_url = self.api_url + url_path
         
         self.get_balance()
-
+        to_sell_num = num
         if(not self.cur_balances.has_key(symbol)):
             logging.info('not get this symbol:%s, return'%symbol)
             return
-        to_sell_num = num
         if self.cur_balances[symbol] <  to_sell_num:
             to_sell_num = self.cur_balances[symbol]
         if to_sell_num*price < 1:
