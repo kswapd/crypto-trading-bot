@@ -139,6 +139,13 @@ class auto_monitor(cv.console_view):
                 kan = self.k_info[cur]['ask']['num']
 
 
+
+               #bid_price = [pbp, hbp, kbp]
+                #ask_price = [pap, hap, kap]
+
+
+
+
                 sub1 = pbp - hap
                 percent1 = sub1*100/hap
                 if percent1 < -100 or percent1 > 100:
@@ -151,7 +158,6 @@ class auto_monitor(cv.console_view):
                     self.poloniex.sell('LTC', pbp, trade_num)
                     self.huobi.buy('ltc', hap, trade_num)
                 
-
                 sub2 = hbp - pap
                 percent2 = sub2*100/pap
                 if percent2 < -100 or percent2 > 100:
@@ -164,9 +170,75 @@ class auto_monitor(cv.console_view):
                     self.poloniex.buy('LTC', pap, trade_num2)
 
 
-                prt_str = coin + " \t\t%7.2f \t%7.2f"%(pbp, hbp)
-                log_str_price = coin + ",%.2f,%.2f,%.2f,%.2f"%(sub1, percent1, sub2,percent2)
-                log_str_num = ",%.2f,%.2f,%.2f,%.2f"%(pbn, han, hbn, pan)
+
+                sub3 = hbp - kap
+                percent3 = sub3*100/kap
+                if percent3 < -100 or percent3 > 100:
+                    percent3 = -1.00
+                if percent3 > 1.0 and cur == 'LTC':
+                    logging.info('get chance3:%.2f,%.2f, %.2f,%.2f, %.2f'%(hbp, hbn,kap,kan, percent3))
+
+                    trade_num3 = hbn if hbn < kan else kan
+                    self.huobi.sell('ltc', hbp, trade_num3)
+                    self.kraken.buy('LTC', kap, trade_num3)
+
+
+
+
+
+
+                sub4 = kbp - hap
+                percent4 = sub1*100/hap
+                if percent4 < -100 or percent4 > 100:
+                    percent4 = -1.00
+
+                if percent4 > 1.0 and cur=='LTC':
+                    
+                    logging.info('get chance4:%.2f,%.2f, %.2f,%.2f, %.2f'%(kbp, kbn,hap,han, percent4))
+                    trade_num4 =  kbn if  kbn < han else han
+                    self.kraken.sell('LTC', kbp, trade_num4)
+                    self.huobi.buy('ltc', hap, trade_num4)
+
+
+
+
+                sub5 = pbp - kap
+                percent5 = sub5*100/kap
+                if percent5 < -100 or percent5 > 100:
+                    percent5 = -1.00
+
+                if percent5 > 1.0 and cur=='LTC':
+                    
+                    logging.info('get chance5:%.2f,%.2f, %.2f,%.2f, %.2f'%(pbp, pbn,kap,kan, percent5))
+                    trade_num5 =  pbn if  pbn < kan else kan
+                    self.poloniex.sell('LTC', pbp, trade_num5)
+                    self.kraken.buy('LTC', kap, trade_num5)
+
+
+
+
+                sub6 = kbp - pap
+                percent6 = sub1*100/pap
+                if percent6 < -100 or percent6 > 100:
+                    percent6 = -1.00
+
+                if percent6 > 1.0 and cur=='LTC':
+                    
+                    logging.info('get chance6:%.2f,%.2f, %.2f,%.2f, %.2f'%(kbp, kbn,pap,pan, percent6))
+                    trade_num6 =  kbn if  kbn < pan else pan
+                    self.kraken.sell('LTC', kbp, trade_num6)
+                    self.poloniex.buy('LTC', pap, trade_num6)
+
+
+
+
+
+
+
+
+                prt_str = coin + " \t\t%7.2f \t%7.2f \t%7.2f"%(pbp, hbp, kbp)
+                log_str_price = coin + ",%.2f,%.2f,%.2f,%.2f,%.2f,%.2f"%(percent1,percent2,percent3,percent4,percent5,percent6)
+                #log_str_num = ",%.2f,%.2f,%.2f,%.2f"%(pbn, han, hbn, pan)
                
                 prt_str =  re.sub(r'(-1.00)','--\t', prt_str)   
         
