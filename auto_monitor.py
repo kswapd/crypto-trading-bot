@@ -186,7 +186,7 @@ class auto_monitor(cv.console_view):
 
 
                 sub4 = kbp - hap
-                percent4 = sub1*100/hap
+                percent4 = sub4*100/hap
                 if percent4 < -100 or percent4 > 100:
                     percent4 = -1.00
 
@@ -216,7 +216,7 @@ class auto_monitor(cv.console_view):
 
 
                 sub6 = kbp - pap
-                percent6 = sub1*100/pap
+                percent6 = sub6*100/pap
                 if percent6 < -100 or percent6 > 100:
                     percent6 = -1.00
 
