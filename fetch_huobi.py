@@ -13,7 +13,7 @@ import datetime
 import collections
 class fetch_huobi(cv.console_view):
     def __init__(self, x = 0, y = 16, width = 80, height = 15, is_view = True):
-        cv.console_view.__init__(self, x, y, width, height, is_view)
+        #cv.console_view.__init__(self, x, y, width, height, is_view)
         self.is_stop = False
         self.num = 50
         self.pos_y = 2

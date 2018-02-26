@@ -21,7 +21,7 @@ import re
 import console_view as cv
 class auto_monitor(cv.console_view):
     def __init__(self, x = 0, y = 0, width = 130, height = 15, is_view = True):
-        cv.console_view.__init__(self, x, y, width, height, is_view)
+        #cv.console_view.__init__(self, x, y, width, height, is_view)
         self.p_info = {}
         self.k_info = {}
         self.log_init()
@@ -73,14 +73,15 @@ class auto_monitor(cv.console_view):
         self.kraken.get_open_info()
     def start_monitor(self, thrd_name,delay):
         logging.info('start monitor...')
+        print('start monitor...')
         time.sleep(2)
         #stdscr = curses.newwin(15, 140, 0, 0)
-        stdscr = curses.newwin(self.display_pos['height'], self.display_pos['width'], self.display_pos['y'], self.display_pos['x'])
+        #stdscr = curses.newwin(self.display_pos['height'], self.display_pos['width'], self.display_pos['y'], self.display_pos['x'])
 
-        curses.start_color()
-        curses.init_pair(1, curses.COLOR_GREEN, curses.COLOR_BLACK)
-        curses.init_pair(2, curses.COLOR_RED, curses.COLOR_BLACK)
-        curses.init_pair(3, curses.COLOR_YELLOW, curses.COLOR_BLACK)
+        #curses.start_color()
+        #curses.init_pair(1, curses.COLOR_GREEN, curses.COLOR_BLACK)
+        #curses.init_pair(2, curses.COLOR_RED, curses.COLOR_BLACK)
+        #curses.init_pair(3, curses.COLOR_YELLOW, curses.COLOR_BLACK)
         while True:
             self.p_info = self.poloniex.monitor_info
             self.k_info = self.kraken.monitor_info
@@ -90,7 +91,7 @@ class auto_monitor(cv.console_view):
            
             pos_x = 2
             pos_y = 2
-            stdscr.box(curses.ACS_VLINE, curses.ACS_HLINE)
+            #stdscr.box(curses.ACS_VLINE, curses.ACS_HLINE)
             #stdscr.addstr(pos_x,pos_y,'Cryptocurrency exchange Monitor', curses.color_pair(3))
             pos_x += 1
             nowtime = time.time()
@@ -238,23 +239,23 @@ class auto_monitor(cv.console_view):
                 log_str_price = coin + ",%.2f,%.2f,%.2f,%.2f,%.2f,%.2f"%(percent1,percent2,percent3,percent4,percent5,percent6)
                 #log_str_num = ",%.2f,%.2f,%.2f,%.2f"%(pbn, han, hbn, pan)
                
-                prt_str =  re.sub(r'(-1.00)','--\t', prt_str)   
+                #prt_str =  re.sub(r'(-1.00)','--\t', prt_str)   
         
                 #stdscr.addstr(pos_x,pos_y,prt_str,curses.color_pair(3))
                 pos_x += 1
 
                 log_str = log_str_price
-                log_str =  re.sub(r'(-1.00)','--', log_str)   
+                #log_str =  re.sub(r'(-1.00)','--', log_str)   
     	    	logging.info(log_str)
             #stdscr.refresh()
             time.sleep(2)
 
     def start(self):
         try:
-            curses.initscr()
-	    curses.noecho()
+            #curses.initscr()
+	    #curses.noecho()
 	    #curses.cbreak()
-	    curses.curs_set(0)
+	    #curses.curs_set(0)
             #td1 = thread.start_new_thread( start_coin_market,('55',2) )
             #td2 = thread.start_new_thread( self.start_yobit,('5',2) )
             #td6 = thread.start_new_thread( self.start_binance,('9',2) )
@@ -271,14 +272,15 @@ class auto_monitor(cv.console_view):
                 pass
         except KeyboardInterrupt as e:
             #coin_market.stop()
-            curses.endwin()
+            #curses.endwin()
             print 'over'
     def stop(self):
-        curses.endwin()
+        print 'over'
+        #curses.endwin()
 
 if __name__ == "__main__":
-    curses.initscr()
-    curses.noecho()
+    #curses.initscr()
+    #curses.noecho()
     info = auto_monitor()
     try:
         info.start()
