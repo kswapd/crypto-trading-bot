@@ -137,8 +137,12 @@ class auto_monitor(cv.console_view):
                 kap = self.k_info[cur]['ask']['price']
                 kan = self.k_info[cur]['ask']['num']
 
+                all_exchanges_info = {'poloniex':self.p_info[cur], 'huobi':self.huobi_info, 'kraken':self.k_info}
+                max_bid = sorted(dict,key=lambda x:all_exchanges_info[x]['bid']['price'])[-1]
 
+                min_ask = sorted(dict,key=lambda x:all_exchanges_info[x]['ask']['price'])[0]    
 
+                print('maxbid:%s, minask:%s'%(max_bid, min_ask))
                #bid_price = [pbp, hbp, kbp]
                 #ask_price = [pap, hap, kap]
 
