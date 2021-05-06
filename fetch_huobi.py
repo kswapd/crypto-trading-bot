@@ -1,6 +1,6 @@
 #! /usr/bin/python
 #-*-coding:utf-8-*- 
-import urllib,urllib2
+import urllib.request
 import json
 import sys, time
 import curses
@@ -121,19 +121,19 @@ class fetch_huobi(cv.console_view):
 
         post_data_enc = urllib.urlencode(post_data)
 
-        #req = urllib2.Request(req_url, post_data_enc)
+        #req = urllib.request.Request(req_url, post_data_enc)
 
         post_data_dump = json.dumps(post_data)
         logging.info(post_data_dump)
         try:
             ret = requests.post(req_url, data=post_data_dump, headers=self.send_headers)
             json_obj = json.loads(ret.text)
-            #res = urllib2.urlopen(req, timeout=5)
+            #res = urllib.request.urlopen(req, timeout=5)
             #page = res.read()
             #json_obj = json.loads(page)
             logging.info('sell success'+'{:}'.format(json_obj))
          
-        except Exception,e:
+        except  e:
             err = 'sell at huobi error'
             logging.info(err)
             logging.info(e)
@@ -198,19 +198,19 @@ class fetch_huobi(cv.console_view):
 
         post_data_enc = urllib.urlencode(post_data)
 
-        #req = urllib2.Request(req_url, post_data_enc)
+        #req = urllib.request.Request(req_url, post_data_enc)
 
         post_data_dump = json.dumps(post_data)
         logging.info(post_data_dump)
         try:
             ret = requests.post(req_url, data=post_data_dump, headers=self.send_headers)
             json_obj = json.loads(ret.text)
-            #res = urllib2.urlopen(req, timeout=5)
+            #res = urllib.request.urlopen(req, timeout=5)
             #page = res.read()
             #json_obj = json.loads(page)
             logging.info('buy success'+'{:}'.format(json_obj))
          
-        except Exception,e:
+        except  e:
             err = 'buy at huobi error'
             logging.info(err)
             logging.info(e)
@@ -244,14 +244,14 @@ class fetch_huobi(cv.console_view):
         msg['SignatureVersion']+'&Timestamp='+urllib.quote(msg['Timestamp'])+'&Signature='+urllib.quote(signature)
         logging.info(req_url)
         #print('{:}'.format(self.send_headers))	
-        req = urllib2.Request(req_url, headers=self.send_headers)
-        #ret = urllib2.urlopen(urllib2.Request('https://poloniex.com/tradingApi', post_data, headers))
+        req = urllib.request.Request(req_url, headers=self.send_headers)
+        #ret = urllib.request.urlopen(urllib.request.Request('https://poloniex.com/tradingApi', post_data, headers))
             #elf.send_headers['Key'] = self.apikey
             #    'Sign': mysign,
             #    'Key': self.apikey
             #}
         try:
-            res = urllib2.urlopen(req,timeout=5)
+            res = urllib.request.urlopen(req,timeout=5)
             page = res.read()
             json_obj = json.loads(page)
             #print('{:}'.format(json_obj))
@@ -262,10 +262,10 @@ class fetch_huobi(cv.console_view):
                 logging.info('{:}'.format(self.cur_balances))
             else:
                 logging.info(json_obj) 
-        except Exception,e:
+        except  e:
             err = 'Get huobi balance error'
-            print err
-            print e
+            print(err)
+            print(e)
             logging.info(err)
             logging.info(e)
             time.sleep(1)
@@ -297,22 +297,22 @@ class fetch_huobi(cv.console_view):
         msg['SignatureVersion']+'&Timestamp='+urllib.quote(msg['Timestamp'])+'&Signature='+signature
         print(req_url)
         #print('{:}'.format(self.send_headers)) 
-        req = urllib2.Request(req_url, headers=self.send_headers)
-        #ret = urllib2.urlopen(urllib2.Request('https://poloniex.com/tradingApi', post_data, headers))
+        req = urllib.request.Request(req_url, headers=self.send_headers)
+        #ret = urllib.request.urlopen(urllib.request.Request('https://poloniex.com/tradingApi', post_data, headers))
             #elf.send_headers['Key'] = self.apikey
             #    'Sign': mysign,
             #    'Key': self.apikey
             #}
         try:
-            res = urllib2.urlopen(req,timeout=5)
+            res = urllib.request.urlopen(req,timeout=5)
             page = res.read()
             json_obj = json.loads(page)
             #print(json_obj)    
             print('{:}'.format(json_obj))  
            
-        except Exception,e:
+        except  e:
             err = 'Get huobi balance error'
-            print e
+            print(e)
             logging.info(err)
             time.sleep(1)
 
@@ -328,14 +328,13 @@ class fetch_huobi(cv.console_view):
             #    'Sign': mysign,
             #    'Key': self.apikey
             #}
-        req = urllib2.Request(ticker_url, headers=self.send_headers)
+        req = urllib.request.Request(ticker_url, headers=self.send_headers)
         try:
-            res = urllib2.urlopen(req,timeout=5)
+            res = urllib.request.urlopen(req,timeout=5)
             page = res.read()
             json_obj = json.loads(page)
             self.monitor_info['time'] = time.time()
             for pair in self.target_symbol:
-                #print pair
                 if self.symbol_info_pair.has_key(pair):
                     #self.monitor_info[self.symbol_info_pair[pair]]['last']['price'] = float(json_obj[pair]['last'])
                     self.monitor_info[self.symbol_info_pair[pair]]['bid']['price'] = float(json_obj['tick']['bid'][0])
@@ -343,7 +342,7 @@ class fetch_huobi(cv.console_view):
                     self.monitor_info[self.symbol_info_pair[pair]]['ask']['price'] = float(json_obj['tick']['ask'][0])
                     self.monitor_info[self.symbol_info_pair[pair]]['ask']['num'] = float(json_obj['tick']['ask'][1])
                     #self.monitor_info[self.symbol_info_pair[pair]]['change'] = float(json_obj[pair]['percentChange'])
-        except Exception,e:
+        except  e:
             err = 'Get huobi ticker error'
             logging.info(err)
             logging.info(e)
@@ -354,7 +353,6 @@ class fetch_huobi(cv.console_view):
         while not self.is_stop:
             self.get_ticker()
             #self.get_order_book()
-            #print '{:}'.format(self.monitor_info)
             time.sleep(2)
 
 if __name__ == "__main__":

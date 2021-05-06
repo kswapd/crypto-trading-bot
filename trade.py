@@ -24,8 +24,6 @@ class auto_trade:
          self.k.secret = keys_conf.keys_info['kraken']['secret']
          #self.k.load_markets()
          print(self.k.symbols)
-         #print (self.k.fetch_balance ())
-         #print (self.k.fetch_orders ())
          #self.k.create_market_buy_order ('BTC/USD', 0.1)
          #print(self.k.fetch_ohlcv('LTC/USD', '1d'))
     def start(self):
@@ -65,7 +63,7 @@ class auto_trade:
             bid = orderbook['bids'][0][0] if len (orderbook['bids']) > 0 else None
             ask = orderbook['asks'][0][0] if len (orderbook['asks']) > 0 else None
             spread = (ask - bid) if (bid and ask) else None
-            print (i, r.id, 'market price', { 'bid': bid, 'ask': ask, 'spread': spread }, "cost: %s sec"%(time.time()-start))
+            print(i, r.id, 'market price', { 'bid': bid, 'ask': ask, 'spread': spread }, "cost: %s sec"%(time.time()-start))
             r = self.y
             start = time.time()
             orderbook = r.fetch_order_book('BTC/USD', {
@@ -74,5 +72,5 @@ class auto_trade:
             bid = orderbook['bids'][0][0] if len (orderbook['bids']) > 0 else None
             ask = orderbook['asks'][0][0] if len (orderbook['asks']) > 0 else None
             spread = (ask - bid) if (bid and ask) else None
-            print (i, r.id, 'market price', { 'bid': bid, 'ask': ask, 'spread': spread }, "cost: %s sec"%(time.time()-start))
+            print(i, r.id, 'market price', { 'bid': bid, 'ask': ask, 'spread': spread }, "cost: %s sec"%(time.time()-start))
             """

@@ -10,7 +10,7 @@ import fetch_coinmarket
 import fetch_yobit
 import fetch_poloniex
 import fetch_kraken
-import thread
+import _thread
 import curses
 import auto_monitor
 if __name__ == "__main__":

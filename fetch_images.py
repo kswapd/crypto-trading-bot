@@ -7,7 +7,7 @@
 '''
 
 #导入所需的库
-import urllib.request,socket,re,sys,os
+import urllib.request.request,socket,re,sys,os
 
 #定义文件保存路径
 targetPath = "./images"

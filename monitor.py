@@ -6,7 +6,7 @@ import fetch_coinmarket
 import fetch_yobit
 import fetch_poloniex
 import fetch_kraken
-import thread
+import _thread
 import curses
 class trade_monitor:
     def __init__(self):

@@ -1,9 +1,9 @@
 #! /usr/bin/python
-import ConfigParser
+import configparser
 import string, os, sys
 class TradeKeys:
     def __init__(self):
-        cf = ConfigParser.ConfigParser()
+        cf = configparser.ConfigParser()
         cf.read("keys.ini")
         kraken_public = cf.get("kraken", "public")
         kraken_secret = cf.get("kraken", "secret")

@@ -1,6 +1,6 @@
 #! /usr/bin/python
 #-*-coding:utf-8-*- 
-import urllib,urllib2
+import urllib.request
 import json
 import sys, time
 import curses
@@ -78,16 +78,16 @@ class fetch_poloniex(cv.console_view):
         mysign = hmac.new(self.secret, post_data, hashlib.sha512).hexdigest()
         self.send_headers['Sign'] = mysign
         self.send_headers['Key'] = self.apikey
-        req = urllib2.Request(self.trade_base_url,post_data, headers=self.send_headers)
+        req = urllib.request.Request(self.trade_base_url,post_data, headers=self.send_headers)
         try:
-            #res = urllib2.urlopen(req,timeout=5)
+            #res = urllib.request.urlopen(req,timeout=5)
             #page = res.read()
             #json_obj = json.loads(page)
 
             ret = requests.post(self.trade_base_url, data=myreq, headers=self.send_headers)
             json_obj = json.loads(ret.text)
             logging.info('sell success'+'{:}'.format(json_obj))
-        except Exception,e:
+        except  e:
             err = 'sell at poloniex error'
             logging.info(err)
             logging.info(e)
@@ -120,16 +120,16 @@ class fetch_poloniex(cv.console_view):
         mysign = hmac.new(self.secret, post_data, hashlib.sha512).hexdigest()
         self.send_headers['Sign'] = mysign
         self.send_headers['Key'] = self.apikey
-        req = urllib2.Request(self.trade_base_url,post_data, headers=self.send_headers)
+        req = urllib.request.Request(self.trade_base_url,post_data, headers=self.send_headers)
         try:
-            #res = urllib2.urlopen(req,timeout=5)
+            #res = urllib.request.urlopen(req,timeout=5)
             #page = res.read()
             #json_obj = json.loads(page)
 
             ret = requests.post(self.trade_base_url, data=myreq, headers=self.send_headers)
             json_obj = json.loads(ret.text)
             logging.info('buy success'+'{:}'.format(json_obj))
-        except Exception,e:
+        except  e:
             err = 'buy at poloniex error'
             logging.info(err)
             logging.info(e)
@@ -141,30 +141,28 @@ class fetch_poloniex(cv.console_view):
         myreq['command'] = 'returnBalances' 
         myreq['nonce'] = int(time.time()*1000)
         post_data = urllib.urlencode(myreq)
-        #print (self.secret, self.apikey)
         mysign = hmac.new(self.secret, post_data, hashlib.sha512).hexdigest()
         self.send_headers['Sign'] = mysign
         self.send_headers['Key'] = self.apikey
         #print('{:}'.format(self.send_headers))	
-        req = urllib2.Request(self.trade_base_url,post_data, headers=self.send_headers)
-        #ret = urllib2.urlopen(urllib2.Request('https://poloniex.com/tradingApi', post_data, headers))
+        req = urllib.request.Request(self.trade_base_url,post_data, headers=self.send_headers)
+        #ret = urllib.request.urlopen(urllib.request.Request('https://poloniex.com/tradingApi', post_data, headers))
             #elf.send_headers['Key'] = self.apikey
             #    'Sign': mysign,
             #    'Key': self.apikey
             #}
         try:
-            res = urllib2.urlopen(req,timeout=5)
+            res = urllib.request.urlopen(req,timeout=5)
             page = res.read()
             json_obj = json.loads(page)
             #print(json_obj['SDC'])	
             #print('{:}'.format(json_obj))	
             for (k,v) in json_obj.items():
                 if float(v)>0.000001:
-                #    print (k,v)
                     self.cur_balances[k] = float(v)
-        except Exception,e:
+        except  e:
             err = 'Get poloniex balance error'
-            print e
+            print(e)
             logging.info(err)
             time.sleep(1)
 
@@ -182,9 +180,9 @@ class fetch_poloniex(cv.console_view):
             #    'Sign': mysign,
             #    'Key': self.apikey
             #}
-        req = urllib2.Request(ticker_url, headers=self.send_headers)
+        req = urllib.request.Request(ticker_url, headers=self.send_headers)
         try:
-            res = urllib2.urlopen(req,timeout=5)
+            res = urllib.request.urlopen(req,timeout=5)
             page = res.read()
             json_obj = json.loads(page)
             self.monitor_info['time'] = time.time()
@@ -194,15 +192,15 @@ class fetch_poloniex(cv.console_view):
                     self.monitor_info[self.symbol_info_pair[pair]]['bid']['price'] = float(json_obj[pair]['highestBid'])
                     self.monitor_info[self.symbol_info_pair[pair]]['ask']['price'] = float(json_obj[pair]['lowestAsk'])
                     self.monitor_info[self.symbol_info_pair[pair]]['change'] = float(json_obj[pair]['percentChange'])
-        except Exception,e:
+        except  e:
             err = 'Get poloniex ticker error'
             logging.info(err)
             time.sleep(1)
     def get_order_book(self):
         ticker_url = self.order_book_url
-        req = urllib2.Request(ticker_url, headers=self.send_headers)
+        req = urllib.request.Request(ticker_url, headers=self.send_headers)
         try:
-            res = urllib2.urlopen(req,timeout=5)
+            res = urllib.request.urlopen(req,timeout=5)
             page = res.read()
             json_obj = json.loads(page)
             self.monitor_info['time'] = time.time()
@@ -213,7 +211,7 @@ class fetch_poloniex(cv.console_view):
                     self.monitor_info[self.symbol_info_pair[pair]]['bid']['num'] = float(json_obj[pair]['bids'][0][1])
                     self.monitor_info[self.symbol_info_pair[pair]]['ask']['num'] = float(json_obj[pair]['asks'][0][1])
                     self.monitor_info[self.symbol_info_pair[pair]]['isFrozen'] = int(json_obj[pair]['isFrozen'])
-        except Exception,e:
+        except  e:
             err = 'Get poloniex order book error'
             logging.info(err)
             time.sleep(1)
@@ -222,7 +220,6 @@ class fetch_poloniex(cv.console_view):
         while not self.is_stop:
             self.get_ticker()
             self.get_order_book()
-            #print '{:}'.format(self.monitor_info)
             time.sleep(2)
 
 if __name__ == "__main__":

@@ -1,6 +1,6 @@
 #! /usr/bin/python
 #-*-coding:utf-8-*- 
-import urllib2
+import urllib.request
 import json
 import sys, time
 import curses
@@ -54,12 +54,12 @@ class fetch_yobit(cv.console_view):
 
         while not self.is_stop:
             cur_pos_x = 2;
-            req = urllib2.Request(ticker_url, headers=self.send_headers)
+            req = urllib.request.Request(ticker_url, headers=self.send_headers)
             try:
-                res = urllib2.urlopen(req, timeout=5)
+                res = urllib.request.urlopen(req, timeout=5)
                 page = res.read()
                 json_obj = json.loads(page)
-            except Exception,e:
+            except  e:
                 err =  'Get yobit data error, please set right cookies'
                 self.stdscr.addstr(cur_pos_x,self.pos_y,err,curses.color_pair(3))
                 self.stdscr.refresh()
@@ -102,7 +102,6 @@ class fetch_yobit(cv.console_view):
                     self.stdscr.addstr(cur_pos_x,self.pos_y,print_content,curses.color_pair(color_index))
                     cur_pos_x += 1
 
-                #print "hi:%d\r"%i
                 #stdscr.addstr(i, 0,  "hi:%d"%i)
                 #sys.stdout.flush()
                 self.stdscr.refresh()

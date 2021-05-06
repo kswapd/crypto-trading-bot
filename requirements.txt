@@ -1,1 +1,4 @@
 ccxt
+Pillow
+#selenium
+bs4

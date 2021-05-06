@@ -1,6 +1,6 @@
 #! /usr/bin/python
 #-*-coding:utf-8-*- 
-import urllib2
+import urllib.request
 import json
 import sys, time
 import curses
@@ -16,7 +16,7 @@ class fetch_binance(cv.console_view):
         self.method = ('depth','ticker','trades', 'info')
         self.trade_list = ('BTCUSDT', 'LTCUSDT', 'ETHUSDT', 'XRPUSDT', 'DASHUSDT') 
         #self.coin_url = "https://api.coinmarketcap.com/v1/ticker/?limit=%d"%self.num
-	self.base_url = 'https://api.binance.com/api/v3/ticker/price'
+        self.base_url = 'https://api.binance.com/api/v3/ticker/price'
         self.send_headers = {
  'Accept':'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
  'User-Agent':'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/63.0.3239.132 Safari/537.36',
@@ -41,7 +41,7 @@ class fetch_binance(cv.console_view):
     def get_ticker(self):
         ticker_url = self.base_url
         print(ticker_url)
-        #self.stdscr = curses.initscr()
+        self.stdscr = curses.initscr()
         #self.stdscr = curses.initscr()
         #self.stdscr = curses.newwin(15, 80, 16, 80)
         self.stdscr = curses.newwin(self.display_pos['height'], self.display_pos['width'], self.display_pos['y'], self.display_pos['x'])
@@ -54,13 +54,13 @@ class fetch_binance(cv.console_view):
 
         while not self.is_stop:
             cur_pos_x = 2;
-            req = urllib2.Request(ticker_url, headers=self.send_headers)
+            req = urllib.request.Request(ticker_url, headers=self.send_headers)
             try:
-                res = urllib2.urlopen(req,timeout=5)
+                res = urllib.request.urlopen(req,timeout=5)
                 page = res.read()
                 json_obj_all = json.loads(page)
                 json_obj = json_obj_all
-            except Exception,e:
+            except  e:
                 err = 'Get binance data error, please set right cookies'
                 self.stdscr.addstr(cur_pos_x,self.pos_y,err,curses.color_pair(3))
                 self.stdscr.refresh()
@@ -102,7 +102,6 @@ class fetch_binance(cv.console_view):
                         self.stdscr.addstr(cur_pos_x,self.pos_y,print_content,curses.color_pair(color_index))
                         cur_pos_x += 1
 
-                    #print "hi:%d\r"%i
                     #stdscr.addstr(i, 0,  "hi:%d"%i)
                     #sys.stdout.flush()
                     self.stdscr.refresh()

@@ -1,6 +1,6 @@
 #! /usr/bin/python
 #-*-coding:utf-8-*- 
-import urllib,urllib2
+import urllib.request
 import json
 import sys, time
 import curses

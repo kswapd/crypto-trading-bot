@@ -1,10 +1,10 @@
-import urllib2
+import urllib.request
 class fetch_url:
     def __init__(self):
-        print 'init'
+        print('init')
     def start(self):
-        req = urllib2.Request('http://www.baidu.com')
-        res = urllib2.urlopen(req)
+        req = urllib.request.Request('http://www.baidu.com')
+        res = urllib.request.urlopen(req)
         page = res.read()
-        print page
+        print(page)
 

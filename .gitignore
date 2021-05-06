@@ -5,3 +5,6 @@ images/
 *.log
 monitor.log*
 *.out
+bin
+lib
+

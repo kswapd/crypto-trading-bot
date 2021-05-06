@@ -11,7 +11,7 @@ import fetch_poloniex
 import fetch_kraken
 import fetch_binance
 import fetch_huobi
-import thread
+import _thread
 import curses
 import monitor
 import logging
@@ -25,14 +25,14 @@ class auto_monitor(cv.console_view):
         self.p_info = {}
         self.k_info = {}
         self.log_init()
-	self.min_w = 30	
-	self.min_h = 15
-	self.min_y = 16
+        self.min_w = 30	
+        self.min_h = 15
+        self.min_y = 16
     def log_init(self):
         '''
         log_fmt = '%(asctime)s\tFile \"%(filename)s\",line %(lineno)s\t%(levelname)s: %(message)s'
         formatter = logging.Formatter(log_fmt)
-        log_file_handler = TimedRotatingFileHandler(filename="monitor"+"thread_", when="D", interval=1, backupCount=7)
+        log_file_handler = TimedRotatingFileHandler(filename="monitor"+"_thread", when="D", interval=1, backupCount=7)
         log_file_handler.suffix = "%Y-%m-%d_%H-%M.log"
         log_file_handler.extMatch = re.compile(r"^\d{4}-\d{2}-\d{2}_\d{2}-\d{2}.log$")
         log_file_handler.setFormatter(formatter)
@@ -250,7 +250,7 @@ class auto_monitor(cv.console_view):
 
                 log_str = log_str_price
                 #log_str =  re.sub(r'(-1.00)','--', log_str)   
-    	    	logging.info(log_str)
+                logging.info(log_str)
             #stdscr.refresh()
             time.sleep(2)
 
@@ -260,26 +260,26 @@ class auto_monitor(cv.console_view):
 	    #curses.noecho()
 	    #curses.cbreak()
 	    #curses.curs_set(0)
-            #td1 = thread.start_new_thread( start_coin_market,('55',2) )
-            #td2 = thread.start_new_thread( self.start_yobit,('5',2) )
-            #td6 = thread.start_new_thread( self.start_binance,('9',2) )
-            td3 = thread.start_new_thread( self.start_poloniex,('6',2) )
-            td4 = thread.start_new_thread( self.start_kraken,('7',2) )
-            td5 = thread.start_new_thread( self.start_monitor,('8',2) )
-            td7 = thread.start_new_thread( self.start_huobi,('9',2) )
+            #td1 = _thread.start_new_thread( start_coin_market,('55',2) )
+            #td2 = _thread.start_new_thread( self.start_yobit,('5',2) )
+            #td6 = _thread.start_new_thread( self.start_binance,('9',2) )
+            #td3 = _thread.start_new_thread( self.start_poloniex,('6',2) )
+            #td4 = _thread.start_new_thread( self.start_kraken,('7',2) )
+            #td5 = _thread.start_new_thread( self.start_monitor,('8',2) )
+            #td7 = _thread.start_new_thread( self.start_huobi,('9',2) )
             #time.sleep(0.5)
         except KeyboardInterrupt as e:
             #coin_market.stop()
-            print 'over'
+            print('over')
         try:
             while 1:
                 pass
         except KeyboardInterrupt as e:
             #coin_market.stop()
             #curses.endwin()
-            print 'over'
+            print('over')
     def stop(self):
-        print 'over'
+        print('over')
         #curses.endwin()
 
 if __name__ == "__main__":

@@ -1,6 +1,6 @@
 #! /usr/bin/python
 #-*-coding:utf-8-*- 
-import urllib2
+import urllib.request
 import json
 import sys, time
 import curses
@@ -12,7 +12,8 @@ class fetch_coinmarket(cv.console_view):
         self.num = 50
         self.pos_y = 2 
         self.targetSymbol = ('BTC','ETH','XRP', 'BCH', 'LTC',  'DASH', 'USDT', 'DOGE')
-        self.coin_url = "https://api.coinmarketcap.com/v1/ticker/?limit=%d"%self.num
+        #self.coin_url = "https://pro-api.coinmarketcap.com/v1/ticker/?limit=%d"%self.num
+        self.coin_url = "https://pro-api.coinmarketcap.com/v1/cryptocurrency/listings/latest"
     def stop(self):
         self.is_stop = True
         curses.endwin()
@@ -33,10 +34,15 @@ class fetch_coinmarket(cv.console_view):
 
         while not self.is_stop:
             cur_pos_x = 2;
-            req = urllib2.Request(self.coin_url)
-            res = urllib2.urlopen(req)
+            headers = {
+                'Accepts': 'application/json',
+                'X-CMC_PRO_API_KEY': 'b22f9e6d-6c09-431d-ac9a-fd87131fc9a5',
+                }
+            req = urllib.request.Request(url=self.coin_url, headers=headers)
+            res = urllib.request.urlopen(req)
             page = res.read()
             json_obj = json.loads(page)
+            print(json_obj)
             self.stdscr.box(curses.ACS_VLINE, curses.ACS_HLINE)
             self.stdscr.addstr(cur_pos_x,self.pos_y,'Coin market cap', curses.color_pair(3))
             cur_pos_x += 1;
@@ -56,7 +62,6 @@ class fetch_coinmarket(cv.console_view):
                     self.stdscr.addstr(cur_pos_x,self.pos_y,print_content,curses.color_pair(color_index))
                     cur_pos_x += 1
 
-                #print "hi:%d\r"%i
                 #stdscr.addstr(i, 0,  "hi:%d"%i)
                 #sys.stdout.flush()
                 self.stdscr.refresh()

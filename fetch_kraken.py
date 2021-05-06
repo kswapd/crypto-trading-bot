@@ -1,6 +1,6 @@
 #! /usr/bin/python
 #-*-coding:utf-8-*- 
-import urllib,urllib2
+import urllib.request
 import json
 import sys, time
 import curses
@@ -69,14 +69,14 @@ class fetch_kraken(cv.console_view):
         self.send_headers['API-Sign'] = base64.b64encode(signature.digest())
         
         #print('{:}'.format(self.send_headers)) 
-        req = urllib2.Request(req_url,post_data, headers=self.send_headers)
-        #ret = urllib2.urlopen(urllib2.Request('https://poloniex.com/tradingApi', post_data, headers))
+        req = urllib.request.Request(req_url,post_data, headers=self.send_headers)
+        #ret = urllib.request.urlopen(urllib.request.Request('https://poloniex.com/tradingApi', post_data, headers))
             #elf.send_headers['Key'] = self.apikey
             #    'Sign': mysign,
             #    'Key': self.apikey
             #}
         try:
-            res = urllib2.urlopen(req,timeout=5)
+            res = urllib.request.urlopen(req,timeout=5)
             page = res.read()
             json_obj = json.loads(page)
             #print(json_obj['SDC']) 
@@ -85,9 +85,9 @@ class fetch_kraken(cv.console_view):
                 if float(v)>0.000001:
                     print (k,v)
                     self.cur_balances[k] = float(v)
-        except Exception,e:
+        except  e:
             err = 'Get kraken balance error'
-            print e
+            print(e)
             logging.info(err)
             time.sleep(1)
 
@@ -131,16 +131,16 @@ class fetch_kraken(cv.console_view):
         self.send_headers['API-Sign'] = base64.b64encode(signature.digest())
 
         
-        #req = urllib2.Request(self.trade_base_url,post_data, headers=self.send_headers)
+        #req = urllib.request.Request(self.trade_base_url,post_data, headers=self.send_headers)
         try:
-            #res = urllib2.urlopen(req,timeout=5)
+            #res = urllib.request.urlopen(req,timeout=5)
             #page = res.read()
             #json_obj = json.loads(page)
 
             ret = requests.post(req_url, data=myreq, headers=self.send_headers)
             json_obj = json.loads(ret.text)
             logging.info('buy success'+'{:}'.format(json_obj))
-        except Exception,e:
+        except  e:
             err = 'buy at kraken error'
             logging.info(err)
             logging.info(e)
@@ -185,16 +185,16 @@ class fetch_kraken(cv.console_view):
         self.send_headers['API-Sign'] = base64.b64encode(signature.digest())
 
         
-        #req = urllib2.Request(self.trade_base_url,post_data, headers=self.send_headers)
+        #req = urllib.request.Request(self.trade_base_url,post_data, headers=self.send_headers)
         try:
-            #res = urllib2.urlopen(req,timeout=5)
+            #res = urllib.request.urlopen(req,timeout=5)
             #page = res.read()
             #json_obj = json.loads(page)
 
             ret = requests.post(req_url, data=myreq, headers=self.send_headers)
             json_obj = json.loads(ret.text)
             logging.info('buy success'+'{:}'.format(json_obj))
-        except Exception,e:
+        except  e:
             err = 'buy at kraken error'
             logging.info(err)
             logging.info(e)
@@ -206,9 +206,9 @@ class fetch_kraken(cv.console_view):
             time.sleep(2)
     def get_ticker(self):
         ticker_url = self.base_url+','.join(self.trade_list)
-        req = urllib2.Request(ticker_url, headers=self.send_headers)
+        req = urllib.request.Request(ticker_url, headers=self.send_headers)
         try:
-            res = urllib2.urlopen(req,timeout=5)
+            res = urllib.request.urlopen(req,timeout=5)
             page = res.read()
             json_obj_all = json.loads(page)
             json_obj = json_obj_all['result']
@@ -218,16 +218,16 @@ class fetch_kraken(cv.console_view):
                     self.monitor_info[self.symbol_info_pair[pair]]['last']['price'] = float(json_obj[pair]['c'][0])
                     self.monitor_info[self.symbol_info_pair[pair]]['bid']['price'] = float(json_obj[pair]['b'][0])
                     self.monitor_info[self.symbol_info_pair[pair]]['ask']['price'] = float(json_obj[pair]['a'][0])
-        except Exception,e:
+        except  e:
             err = 'Get kraken ticker error.' 
             logging.info(err)
             time.sleep(1)
     def get_order_book(self):
         for stock in self.trade_list:
             ticker_url = self.order_book_url+stock
-            req = urllib2.Request(ticker_url, headers=self.send_headers)
+            req = urllib.request.Request(ticker_url, headers=self.send_headers)
             try:
-                res = urllib2.urlopen(req,timeout=5)
+                res = urllib.request.urlopen(req,timeout=5)
                 page = res.read()
                 json_obj_all = json.loads(page)
                 json_obj = json_obj_all['result']
@@ -239,7 +239,7 @@ class fetch_kraken(cv.console_view):
                     self.monitor_info[self.symbol_info_pair[pair]]['bid']['num'] = float(json_obj[pair]['bids'][0][1])
                     self.monitor_info[self.symbol_info_pair[pair]]['ask']['num'] = float(json_obj[pair]['asks'][0][1])
 
-            except Exception,e:
+            except  e:
                 err = 'Get kraken order book error.' 
                 logging.info(err)
                 time.sleep(1)
