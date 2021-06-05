@@ -11,7 +11,7 @@ coinmarketcap, poloniex, binance, huobi, yobit, kraken
 python 3+
 # RUN
 ```
-virtualenv -p python3 
+virtualenv -p python3 .
 source ./bin/activate
 pip install -r requirements.txt
 python ./fetch_coinmarket_new.py
