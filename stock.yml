@@ -1,0 +1,13 @@
+stock:
+  day-duration: 100
+  price-step-unit: 0.01
+  stock-trade-unit: 100
+  stock-open-price: 10
+  #-1 means loop forever
+  loop-days: 0
+log:
+  # ERROR,WARNING,INFO,DEBUG
+  level: INFO
+  file-name: stock.log
+
+

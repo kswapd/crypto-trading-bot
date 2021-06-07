@@ -13,6 +13,7 @@ from requests.packages.urllib3.util.retry import Retry
 import sched, time
 import random
 from datetime import datetime
+import yaml
 session = requests.Session()
 retry = Retry(connect=3, backoff_factor=0.5)
 adapter = HTTPAdapter(max_retries=retry)
@@ -39,14 +40,14 @@ class timer_loop():
         #self.schedule.run()
         self.start_time = time.time()
         self.end_time = time.time()
-
+        self.is_stop = False
         #self.event_func()
     def event_func(self):
         #logging.info("ddddd:", self.param)
         self.end_time = time.time()
         self.func(self.param)
         #logging.info("time:%.2f,%d", self.end_time - self.start_time, self.duration)
-        if self.end_time - self.start_time > self.duration and self.schedule and self.event:
+        if self.end_time - self.start_time > self.duration or self.is_stop:
             #self.schedule.cancel(self.event)
             return
         self.event = self.schedule.enter(self.interval, 1, self.event_func,())
@@ -58,21 +59,21 @@ class timer_loop():
         #self.thread = _thread.start_new_thread(self.event_func,())
         self.thread = _thread.start_new_thread(self.sched_start,())
         #self.schedule.run()
+    def stop(self):
+        self.is_stop = True
     def sched_start(self):
         self.schedule.run()
     #td1 = _thread.start_new_thread( start_coin_market,('55',2) )
 class stock_market():
-    def __init__(self, duration=5, cur_price=10.00, hold=100):
+    def __init__(self, cfg):
         self.is_stop = False
-        self.num = 50
-        self.pos_y = 2 
         self.coin_url = "https://coinmarketcap.com/"
-        self.duration = duration
-        self.cur_price = cur_price
-        self.stock_hold = hold
+        self.duration = cfg['stock']['day-duration']
+        self.cur_price = cfg['stock']['stock-open-price']
+        self.stock_hold =  cfg['stock']['stock-trade-unit']
         self.cur_money = 0.0
-        self.change_stock_unit = 100
-        self.change_price_unit = 0.05
+        self.change_stock_unit = cfg['stock']['stock-trade-unit']
+        self.change_price_unit = cfg['stock']['price-step-unit']
         #卖出价A
         self.sellA = round(self.cur_price*1.02,2)
         #赚钱买入价B
@@ -201,7 +202,8 @@ class stock_market():
                         logging.info(i)
 
             elif self.status == 'finish':
-                #logging.info("Trading finished..")  
+                #logging.info("Trading finished..") 
+                self.stop()
                 pass  
             else:
                 logging.info("No trading here..")      
@@ -220,11 +222,12 @@ class stock_market():
         logging.info("current price:%.2f, %s", self.cur_price, flag)
     def stop(self):
         self.is_stop = True
+        self.stock_market.stop()
         logging.info('stopped')  
     def start(self):
         self.start_time = time.time()  
-        a = timer_loop(1, self.duration, self.change_stock_price)
-        a.start()
+        self.stock_market = timer_loop(1, self.duration, self.change_stock_price)
+        self.stock_market.start()
         
         self.auto_trade_stock()
 
@@ -234,19 +237,56 @@ class stock_market():
             else:
                 pass    
             time.sleep(1)
-        time.sleep(3)
+        time.sleep(1)
 if __name__ == "__main__":
     #logging.basicConfig(format='%(asctime)s %(message)s')
-    #logging.basicConfig(format='%(asctime)s %(message)s', filename='./stock.log', level=logging.INFO)
-    logging.basicConfig(format='%(asctime)s %(message)s', level=logging.INFO)
-    #logging.basicConfig(filename='./stock.log')
-    logging.warning('Started')
-    stock_simu = stock_market(duration=100)
+    with open("stock.yml", "r") as ymlfile:
+        cfg = yaml.load(ymlfile)
+    print('Get configure file.', cfg)
 
-    try:
-        stock_simu.start()
-    except KeyboardInterrupt as e:
-        stock_simu.stop()
+    if cfg['log']['level'] == 'INFO':
+        logLevel = logging.INFO
+    elif cfg['log']['level'] == 'WARN':
+        logLevel = logging.WARN
+    elif cfg['log']['level'] == 'ERROR':
+        logLevel = logging.ERROR
+    elif cfg['log']['level'] == 'DEBUG':
+        logLevel = logging.DEBUG  
+    else:
+        logLevel = logging.INFO       
+    logging.basicConfig(format='%(asctime)s %(message)s', filename=cfg['log']['file-name'], level=logLevel)
+    logging.info('Stock simu started......')
+    logging.info('Get configure file.')
+    logging.info(cfg)
+    #logging.basicConfig(format='%(asctime)s %(message)s', level=logging.INFO)
+    #logging.basicConfig(filename='./stock.log')
+    #stock_simu = stock_market(duration=10)
+    cur_time = 1
+    if cfg['stock']['loop-days'] < 1: 
+        while True:
+            logging.info('Stock market times: %d.', cur_time)
+            stock_simu = stock_market(cfg)
+            try:
+                stock_simu.start()
+            except KeyboardInterrupt as e:
+                stock_simu.stop()
+                logging.info('Stock simu loop finished by key......')
+            cur_time += 1
+    else:
+        loop_days = cfg['stock']['loop-days']
+        while loop_days > 0:
+            logging.info('Stock market times: %d.', cur_time)
+            stock_simu = stock_market(cfg)
+            try:
+                stock_simu.start()
+            except KeyboardInterrupt as e:
+                stock_simu.stop()
+                logging.info('Stock simu finished by key......')
+            cur_time += 1
+            loop_days -= 1
+        logging.info('Stock simu finished......')
+    
+    
     
 
     
