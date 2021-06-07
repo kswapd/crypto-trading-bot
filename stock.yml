@@ -1,10 +1,17 @@
 stock:
   day-duration: 100
-  price-step-unit: 0.01
-  stock-trade-unit: 100
+  price-step-unit: 0.05
+  stock-trade-unit: 200
   stock-open-price: 10
   #-1 means loop forever
+  sellA-index: 1.02
+  buyB-index: 1.01
+  buyC-index: 1.03
+  buyA-index: 0.98
+  sellB-index: 0.99
+  sellC-index: 0.97
   loop-days: 0
+  
 log:
   # ERROR,WARNING,INFO,DEBUG
   level: INFO

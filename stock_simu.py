@@ -35,6 +35,7 @@ class timer_loop():
         self.func = func
         self.param = args
         self.run = False
+        
         self.schedule = sched.scheduler(time.time, time.sleep)
         #self.schedule.enter(self.interval, 1, self.event_func,())
         #self.schedule.run()
@@ -72,22 +73,30 @@ class stock_market():
         self.cur_price = cfg['stock']['stock-open-price']
         self.stock_hold =  cfg['stock']['stock-trade-unit']
         self.cur_money = 0.0
+        self.price_change_count = 1
         self.change_stock_unit = cfg['stock']['stock-trade-unit']
         self.change_price_unit = cfg['stock']['price-step-unit']
+        sellAIndex = cfg['stock']['sellA-index']
+        buyBIndex = cfg['stock']['buyB-index']
+        buyCIndex = cfg['stock']['buyC-index']
+
+        buyAIndex = cfg['stock']['buyA-index']
+        sellBIndex = cfg['stock']['sellB-index']
+        sellCIndex = cfg['stock']['sellC-index']
         #卖出价A
-        self.sellA = round(self.cur_price*1.02,2)
+        self.sellA = round(self.cur_price*sellAIndex,2)
         #赚钱买入价B
-        self.buyB = round(self.cur_price*1.01,2)
+        self.buyB = round(self.cur_price*buyBIndex,2)
         #补仓买入价C
-        self.buyC = round(self.cur_price*1.03,2)
+        self.buyC = round(self.cur_price*buyCIndex,2)
         #补仓买入价D
         self.buyD = round(self.cur_price,2)
         #买入价A
-        self.buyA = round(self.cur_price*0.98,2)
+        self.buyA = round(self.cur_price*buyAIndex,2)
         #赚钱卖出价B
-        self.sellB = round(self.cur_price*0.99,2)
+        self.sellB = round(self.cur_price*sellBIndex,2)
         #补仓卖出价C
-        self.sellC = round(self.cur_price*0.97,2)
+        self.sellC = round(self.cur_price*sellCIndex,2)
         #补仓卖出价D
         self.sellD = round(self.cur_price,2)
 
@@ -96,15 +105,11 @@ class stock_market():
         
 
         self.changeList = []
-
-        logging.info("duration:%d", self.duration)
-        
-        #b = timer_loop(3, self.duration, self.print_time3)
-        #b.start()
+        logging.info("Max duration:%d", self.duration)
     def auto_trade_stock(self):
         self.thread2 = _thread.start_new_thread(self.auto_trade_stock_thrd,())
     def auto_trade_stock_thrd(self):
-        logging.info("auto_trade_stock start. %s",self.is_stop)
+        logging.info("auto_trade_stock start.")
         while not self.is_stop:
             cur = time.time()
             curStr = datetime.today().strftime('%Y-%m-%d-%H:%M:%S')
@@ -117,6 +122,8 @@ class stock_market():
                     self.changeList.append((curStr, 'sell', self.status, self.cur_price, -1*self.change_stock_unit, changed_money))
                     self.stock_hold -= self.change_stock_unit
                     self.cur_money += changed_money
+                    logging.info("%d-%d Sell by sellA price %.2f .", g_market_cur_time, self.price_change_count, self.sellA)
+
                 #elif self.cur_price <= self.buyA:
                 elif self.cur_price == self.buyA:
                     self.status = 'buyA'
@@ -124,6 +131,8 @@ class stock_market():
                     self.changeList.append((curStr, 'buy', self.status, self.cur_price, self.change_stock_unit, changed_money))
                     self.stock_hold += self.change_stock_unit
                     self.cur_money += changed_money
+                    logging.info("%d-%d Buy by buyA price %.2f .", g_market_cur_time, self.price_change_count, self.buyA)
+
             elif self.status == 'sellA':
                 #if self.cur_price <= self.buyB:
                 if self.cur_price == self.buyB:
@@ -134,7 +143,8 @@ class stock_market():
                     self.cur_money += changed_money
                     self.status = 'finish'
                     assetChanged = round(self.changeList[0][-1]  + self.changeList[1][-1],2)
-                    logging.info("Trade finished today, asset changed: %.2f .", assetChanged)
+                    logging.info("%d-%d Trade finished today, asset changed: %.2f .", g_market_cur_time, self.price_change_count, assetChanged)
+                    logging.info("%d-%d Trading flow:", g_market_cur_time, self.price_change_count)
                     for i in self.changeList:
                         logging.info(i)
                 #elif self.cur_price <= self.buyC:
@@ -146,7 +156,8 @@ class stock_market():
                     self.cur_money += changed_money
                     self.status = 'finish'
                     assetChanged = round(self.changeList[0][-1]  + self.changeList[1][-1],2)
-                    logging.info("Trade finished today, asset changed: %.2f .", assetChanged)
+                    logging.info("%d-%d Trade finished today, asset changed: %.2f .", g_market_cur_time, self.price_change_count, assetChanged)
+                    logging.info("%d-%d Trading flow:", g_market_cur_time, self.price_change_count)
                     for i in self.changeList:
                         logging.info(i)
                 # Closing market in 2 seconds:
@@ -158,7 +169,8 @@ class stock_market():
                     self.cur_money += changed_money
                     self.status = 'finish'
                     assetChanged = round(self.changeList[0][-1]  + self.changeList[1][-1],2)
-                    logging.info("Trade finished today, asset changed: %.2f .", assetChanged)
+                    logging.info("%d-%d Trade finished today, asset changed: %.2f .", g_market_cur_time, self.price_change_count, assetChanged)
+                    logging.info("%d-%d Trading flow:", g_market_cur_time, self.price_change_count)
                     for i in self.changeList:
                         logging.info(i)
             
@@ -173,7 +185,8 @@ class stock_market():
                     self.cur_money += changed_money
                     self.status = 'finish'
                     assetChanged = round(self.changeList[0][-1]  + self.changeList[1][-1],2)
-                    logging.info("Trade finished today, asset changed: %.2f .", assetChanged)
+                    logging.info("%d-%d Trade finished today, asset changed: %.2f .", g_market_cur_time, self.price_change_count, assetChanged)
+                    logging.info("%d-%d Trading flow:", g_market_cur_time, self.price_change_count)
                     for i in self.changeList:
                         logging.info(i)
                 #elif self.cur_price >= self.sellC:
@@ -185,7 +198,8 @@ class stock_market():
                     self.cur_money += changed_money
                     self.status = 'finish'
                     assetChanged = round(self.changeList[0][-1]  + self.changeList[1][-1],2)
-                    logging.info("Trade finished today, asset changed: %.2f .", assetChanged)
+                    logging.info("%d-%d Trade finished today, asset changed: %.2f .", g_market_cur_time, self.price_change_count, assetChanged)
+                    logging.info("%d-%d Trading flow:", g_market_cur_time, self.price_change_count)
                     for i in self.changeList:
                         logging.info(i)
                 # Closing market in 2 seconds:
@@ -197,7 +211,8 @@ class stock_market():
                     self.cur_money += changed_money
                     self.status = 'finish'
                     assetChanged = round(self.changeList[0](-1)  + self.changeList[1](-1),2)
-                    logging.info("Trade finished today, asset changed: %.2f .", assetChanged)
+                    logging.info("%d-%d Trade finished today, asset changed: %.2f .", g_market_cur_time, self.price_change_count, assetChanged)
+                    logging.info("%d-%d Trading flow:", g_market_cur_time, self.price_change_count)
                     for i in self.changeList:
                         logging.info(i)
 
@@ -219,7 +234,8 @@ class stock_market():
             flag = 'down'
             self.cur_price -= self.change_price_unit
         self.cur_price = round(self.cur_price,2)
-        logging.info("current price:%.2f, %s", self.cur_price, flag)
+        logging.info("%d-%d current price:%.2f, %s", g_market_cur_time, self.price_change_count, self.cur_price, flag)
+        self.price_change_count += 1
     def stop(self):
         self.is_stop = True
         self.stock_market.stop()
@@ -238,6 +254,7 @@ class stock_market():
                 pass    
             time.sleep(1)
         time.sleep(1)
+g_market_cur_time = 1
 if __name__ == "__main__":
     #logging.basicConfig(format='%(asctime)s %(message)s')
     with open("stock.yml", "r") as ymlfile:
@@ -261,28 +278,27 @@ if __name__ == "__main__":
     #logging.basicConfig(format='%(asctime)s %(message)s', level=logging.INFO)
     #logging.basicConfig(filename='./stock.log')
     #stock_simu = stock_market(duration=10)
-    cur_time = 1
     if cfg['stock']['loop-days'] < 1: 
         while True:
-            logging.info('Stock market times: %d.', cur_time)
+            logging.info('Stock market times: %d.', g_market_cur_time)
             stock_simu = stock_market(cfg)
             try:
                 stock_simu.start()
             except KeyboardInterrupt as e:
                 stock_simu.stop()
                 logging.info('Stock simu loop finished by key......')
-            cur_time += 1
+            g_market_cur_time += 1
     else:
         loop_days = cfg['stock']['loop-days']
         while loop_days > 0:
-            logging.info('Stock market times: %d.', cur_time)
+            logging.info('Stock market times: %d.', g_market_cur_time)
             stock_simu = stock_market(cfg)
             try:
                 stock_simu.start()
             except KeyboardInterrupt as e:
                 stock_simu.stop()
                 logging.info('Stock simu finished by key......')
-            cur_time += 1
+            g_market_cur_time += 1
             loop_days -= 1
         logging.info('Stock simu finished......')
     
