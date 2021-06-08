@@ -61,11 +61,13 @@ class stock_market():
         self.coin_url = "https://coinmarketcap.com/"
         self.duration = cfg['stock']['day-duration']
         self.cur_price = cfg['stock']['stock-open-price']
+        self.base_price = cfg['stock']['stock-open-price']
         self.stock_hold =  cfg['stock']['stock-trade-unit']
         self.cur_money = 0.0
         self.price_change_count = 1
         self.change_stock_unit = cfg['stock']['stock-trade-unit']
         self.change_price_unit = cfg['stock']['price-step-unit']
+        self.max_change_price_percent = cfg['stock']['max-change-percent']
         sellAIndex = cfg['stock']['sellA-index']
         buyBIndex = cfg['stock']['buyB-index']
         buyCIndex = cfg['stock']['buyC-index']
@@ -234,13 +236,29 @@ class stock_market():
         self.cur_price = round(self.cur_price,2)
         logging.info("%d-%d current price:%.2f, %s", g_market_cur_time, self.price_change_count, self.cur_price, flag)
         self.price_change_count += 1
+
+    def change_stock_price_by_percent(self, delta_value=1):
+        flag = 'up'
+        cur_delta = (self.cur_price - self.base_price) / self.base_price
+        probability_delta = cur_delta/self.max_change_price_percent*0.5
+        cur_random = 0.5 + probability_delta
+        cur_random = 0 if cur_random<0 else 1 if cur_random>1 else cur_random
+        if random.random() > cur_random:
+            self.cur_price += self.change_price_unit
+        else:
+            flag = 'down'
+            self.cur_price -= self.change_price_unit
+        self.cur_price = round(self.cur_price,2)
+        logging.info("%d-%d current probability:%.2f,%.2f,%s", g_market_cur_time, self.price_change_count,self.cur_price, 1-cur_random, flag)
+        logging.info("%d-%d current price:%.2f, %s", g_market_cur_time, self.price_change_count, self.cur_price, flag)
+        self.price_change_count += 1
     def stop(self):
         self.is_stop = True
         self.stock_market.stop()
         logging.info('stopped')  
     def start(self):
         self.start_time = time.time()  
-        self.stock_market = timer_loop(1, self.duration, self.change_stock_price)
+        self.stock_market = timer_loop(1, self.duration, self.change_stock_price_by_percent)
         self.stock_market.start()
         
         self.auto_trade_stock()

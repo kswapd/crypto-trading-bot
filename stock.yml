@@ -3,6 +3,7 @@ stock:
   price-step-unit: 0.05
   stock-trade-unit: 200
   stock-open-price: 10
+  max-change-percent: 0.1
   #-1 means loop forever
   sellA-index: 1.02
   buyB-index: 1.01
