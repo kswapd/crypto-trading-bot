@@ -18,3 +18,9 @@ python ./fetch_coinmarket_new.py
 python3 ./stock_simu.py
 deactivate
 ```
+
+# Others
+Stat all aset changed:
+```
+grep -n "asset changed" stock.log |awk -F ':' '{a=substr($5, 2, length($5)-4);print i ":"  a;sum+=a;i+=1} END{print "get all:" sum;}'
+```
