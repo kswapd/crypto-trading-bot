@@ -3,22 +3,12 @@
 import urllib.request
 import json
 import sys, time
-import curses
-import console_view as cv
-import requests
 import _thread
 import logging
-from requests.adapters import HTTPAdapter
-from requests.packages.urllib3.util.retry import Retry
 import sched, time
 import random
 from datetime import datetime
 import yaml
-session = requests.Session()
-retry = Retry(connect=3, backoff_factor=0.5)
-adapter = HTTPAdapter(max_retries=retry)
-session.mount('http://', adapter)
-session.mount('https://', adapter)
 
 def print_time(sc, a='default'):
     logging.info("From print_time", time.time(), a)
@@ -110,6 +100,8 @@ class stock_market():
         self.thread2 = _thread.start_new_thread(self.auto_trade_stock_thrd,())
     def auto_trade_stock_thrd(self):
         logging.info("auto_trade_stock start.")
+        global g_market_cur_time
+        global g_all_changed_asset
         while not self.is_stop:
             cur = time.time()
             curStr = datetime.today().strftime('%Y-%m-%d-%H:%M:%S')
@@ -143,7 +135,8 @@ class stock_market():
                     self.cur_money += changed_money
                     self.status = 'finish'
                     assetChanged = round(self.changeList[0][-1]  + self.changeList[1][-1],2)
-                    logging.info("%d-%d Trade finished today, asset changed: %.2f .", g_market_cur_time, self.price_change_count, assetChanged)
+                    g_all_changed_asset += assetChanged
+                    logging.info("%d-%d Trade finished today, asset changed: %.2f, all changed: %.2f", g_market_cur_time, self.price_change_count, assetChanged,g_all_changed_asset)
                     logging.info("%d-%d Trading flow:", g_market_cur_time, self.price_change_count)
                     for i in self.changeList:
                         logging.info(i)
@@ -156,7 +149,8 @@ class stock_market():
                     self.cur_money += changed_money
                     self.status = 'finish'
                     assetChanged = round(self.changeList[0][-1]  + self.changeList[1][-1],2)
-                    logging.info("%d-%d Trade finished today, asset changed: %.2f .", g_market_cur_time, self.price_change_count, assetChanged)
+                    g_all_changed_asset += assetChanged
+                    logging.info("%d-%d Trade finished today, asset changed: %.2f, all changed: %.2f", g_market_cur_time, self.price_change_count, assetChanged,g_all_changed_asset)
                     logging.info("%d-%d Trading flow:", g_market_cur_time, self.price_change_count)
                     for i in self.changeList:
                         logging.info(i)
@@ -169,7 +163,8 @@ class stock_market():
                     self.cur_money += changed_money
                     self.status = 'finish'
                     assetChanged = round(self.changeList[0][-1]  + self.changeList[1][-1],2)
-                    logging.info("%d-%d Trade finished today, asset changed: %.2f .", g_market_cur_time, self.price_change_count, assetChanged)
+                    g_all_changed_asset += assetChanged
+                    logging.info("%d-%d Trade finished today, asset changed: %.2f, all changed: %.2f", g_market_cur_time, self.price_change_count, assetChanged,g_all_changed_asset)
                     logging.info("%d-%d Trading flow:", g_market_cur_time, self.price_change_count)
                     for i in self.changeList:
                         logging.info(i)
@@ -185,7 +180,8 @@ class stock_market():
                     self.cur_money += changed_money
                     self.status = 'finish'
                     assetChanged = round(self.changeList[0][-1]  + self.changeList[1][-1],2)
-                    logging.info("%d-%d Trade finished today, asset changed: %.2f .", g_market_cur_time, self.price_change_count, assetChanged)
+                    g_all_changed_asset += assetChanged
+                    logging.info("%d-%d Trade finished today, asset changed: %.2f, all changed: %.2f", g_market_cur_time, self.price_change_count, assetChanged,g_all_changed_asset)
                     logging.info("%d-%d Trading flow:", g_market_cur_time, self.price_change_count)
                     for i in self.changeList:
                         logging.info(i)
@@ -198,7 +194,8 @@ class stock_market():
                     self.cur_money += changed_money
                     self.status = 'finish'
                     assetChanged = round(self.changeList[0][-1]  + self.changeList[1][-1],2)
-                    logging.info("%d-%d Trade finished today, asset changed: %.2f .", g_market_cur_time, self.price_change_count, assetChanged)
+                    g_all_changed_asset += assetChanged
+                    logging.info("%d-%d Trade finished today, asset changed: %.2f, all changed: %.2f", g_market_cur_time, self.price_change_count, assetChanged,g_all_changed_asset)
                     logging.info("%d-%d Trading flow:", g_market_cur_time, self.price_change_count)
                     for i in self.changeList:
                         logging.info(i)
@@ -211,7 +208,8 @@ class stock_market():
                     self.cur_money += changed_money
                     self.status = 'finish'
                     assetChanged = round(self.changeList[0](-1)  + self.changeList[1](-1),2)
-                    logging.info("%d-%d Trade finished today, asset changed: %.2f .", g_market_cur_time, self.price_change_count, assetChanged)
+                    g_all_changed_asset += assetChanged
+                    logging.info("%d-%d Trade finished today, asset changed: %.2f, all changed: %.2f", g_market_cur_time, self.price_change_count, assetChanged,g_all_changed_asset)
                     logging.info("%d-%d Trading flow:", g_market_cur_time, self.price_change_count)
                     for i in self.changeList:
                         logging.info(i)
@@ -254,13 +252,15 @@ class stock_market():
                 pass    
             time.sleep(1)
         time.sleep(1)
+
 g_market_cur_time = 1
+g_all_changed_asset = 0
+
 if __name__ == "__main__":
     #logging.basicConfig(format='%(asctime)s %(message)s')
     with open("stock.yml", "r") as ymlfile:
         cfg = yaml.load(ymlfile)
     print('Get configure file.', cfg)
-
     if cfg['log']['level'] == 'INFO':
         logLevel = logging.INFO
     elif cfg['log']['level'] == 'WARN':

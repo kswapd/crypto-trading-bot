@@ -15,5 +15,6 @@ virtualenv -p python3 .
 source ./bin/activate
 pip install -r requirements.txt
 python ./fetch_coinmarket_new.py
+python3 ./stock_simu.py
 deactivate
 ```
