@@ -239,6 +239,7 @@ class stock_market():
 
     def change_stock_price_by_percent(self, delta_value=1):
         flag = 'up'
+        ref_price = self.cur_price
         cur_delta = (self.cur_price - self.base_price) / self.base_price
         probability_delta = cur_delta/self.max_change_price_percent*0.5
         cur_random = 0.5 + probability_delta
@@ -249,8 +250,8 @@ class stock_market():
             flag = 'down'
             self.cur_price -= self.change_price_unit
         self.cur_price = round(self.cur_price,2)
-        logging.info("%d-%d current probability:%.2f,%.2f,%s", g_market_cur_time, self.price_change_count,self.cur_price, 1-cur_random, flag)
-        logging.info("%d-%d current price:%.2f, %s", g_market_cur_time, self.price_change_count, self.cur_price, flag)
+        #logging.info("%d-%d current probability:%.2f,%.2f,%s", g_market_cur_time, self.price_change_count,self.cur_price, 1-cur_random, flag)
+        logging.info("%d-%d current price:(%.2f->%.2f, %s), up pb:%.2f", g_market_cur_time, self.price_change_count, ref_price, self.cur_price, flag, 1-cur_random)
         self.price_change_count += 1
     def stop(self):
         self.is_stop = True
