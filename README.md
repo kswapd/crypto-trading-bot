@@ -24,3 +24,8 @@ Stat all aset changed:
 ```
 grep -n "asset changed" stock.log |awk -F ':' '{a=substr($5, 2, length($5)-4);print i ":"  a;sum+=a;i+=1} END{print "get all:" sum;}'
 ```
+Generate executable file:
+```
+pip install pyinstaller
+pyinstaller -F ./stock_simu.py
+```
