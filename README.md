@@ -36,7 +36,7 @@ If you don't need proxy to connect to coinmarketcap, comment out the line in bin
 #session.proxies.update(proxyDict2)
 ```
 
-## RUN stock simulation
+## Run stock simulation
 ```
 virtualenv -p python3 .
 source ./bin/activate
