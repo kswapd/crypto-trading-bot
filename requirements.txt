@@ -2,3 +2,6 @@ ccxt
 Pillow
 #selenium
 bs4
+pyyaml
+requests==2.23.0
+requests[socks]

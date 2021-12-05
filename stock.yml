@@ -12,10 +12,8 @@ stock:
   sellB-index: 0.99
   sellC-index: 0.97
   loop-days: 0
-  
+
 log:
   # ERROR,WARNING,INFO,DEBUG
   level: INFO
   file-name: stock.log
-
-

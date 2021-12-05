@@ -7,4 +7,4 @@ monitor.log*
 *.out
 bin
 lib
-
+.vscode
