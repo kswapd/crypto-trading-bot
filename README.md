@@ -16,10 +16,13 @@ pip install -r requirements.txt
 python3 ./binance_bot.py
 deactivate
 ```
-If you don't need proxy to connect to binance, comment out the line in binance_trading.py file:
+If you don't need proxy to connect to binance, comment out the line in binance_bot.py file:
 ```.python
 #session.proxies.update(proxyDict2)
 ```
+
+
+
 
 
 
@@ -31,10 +34,31 @@ pip install -r requirements.txt
 python3 ./coinmarket_bot.py
 deactivate
 ```
-If you don't need proxy to connect to coinmarketcap, comment out the line in binance_trading.py file:
+If you don't need proxy to connect to coinmarketcap, comment out the line in coinmarket_bot.py file:
 ```.python
 #session.proxies.update(proxyDict2)
 ```
+
+
+
+
+
+
+## Get poloniex quotations list.
+```
+virtualenv -p python3 .
+source ./bin/activate
+pip install -r requirements.txt
+python3 ./poloniex_bot.py
+deactivate
+```
+If you don't need proxy to connect to poloniex, comment out all lines as belows in poloniex_bot.py file:
+```.python
+#req.set_proxy('127.0.0.1:8001', 'http')
+#req.set_proxy('127.0.0.1:8001', 'https')
+```
+
+
 
 ## Run stock simulation
 ```
