@@ -23,7 +23,7 @@ class poloniex_bot():
         self.method = ('depth', 'ticker', 'trades', 'info')
         self.trade_list = ('ltc_usd', 'btc_usd', 'eth_usd',
                            'bcc_usd', 'dash_usd', 'doge_usd')
-        #self.coin_url = "https://api.coinmarketcap.com/v1/ticker/?limit=%d"%self.num
+        # self.coin_url = "https://api.coinmarketcap.com/v1/ticker/?limit=%d"%self.num
         self.base_url = 'https://poloniex.com/public?command=returnTicker'
         self.trade_base_url = 'https://poloniex.com/tradingApi'
         self.order_book_url = 'https://poloniex.com/public?command=returnOrderBook&&currencyPair=all&depth=1'
@@ -34,11 +34,12 @@ class poloniex_bot():
         }
         keys_conf = conf.TradeKeys()
         self.cur_balances = {}
+        self.open_orders = {}
         self.apikey = keys_conf.keys_info['poloniex']['public']
         self.secret = keys_conf.keys_info['poloniex']['secret']
-        ##self.apikey = 'aaa'
-        #self.secret = 'bbb'
-        #self.display_pos = {'x':0, 'y':16, 'width':80, 'height':15}
+        # self.apikey = 'aaa'
+        # self.secret = 'bbb'
+        # self.display_pos = {'x':0, 'y':16, 'width':80, 'height':15}
         # print(self.secret)
         # print(self.apikey)
         self.monitor_info = {
@@ -63,7 +64,7 @@ class poloniex_bot():
     def sell(self, symbol, price, num):
         logging.info('start sell:%s,%.2f,%.5f' % (symbol, price, num))
         self.get_balance()
-        if(not self.cur_balances.has_key(symbol)):
+        if(symbol not in self.cur_balances):
             logging.info('not get this symbol:%s, return' % symbol)
             return
         to_sell_num = num
@@ -81,31 +82,27 @@ class poloniex_bot():
         myreq['amount'] = to_sell_num
         myreq['command'] = 'sell'
         myreq['nonce'] = int(time.time()*1000)
-        post_data = urllib.urlencode(myreq)
-        mysign = hmac.new(self.secret, post_data, hashlib.sha512).hexdigest()
+        post_data = urllib.parse.urlencode(myreq)
+        mysign = hmac.new(self.secret.encode('utf-8'),
+                          post_data.encode('utf-8'), hashlib.sha512).hexdigest()
         self.send_headers['Sign'] = mysign
         self.send_headers['Key'] = self.apikey
         req = urllib.request.Request(
-            self.trade_base_url, post_data, headers=self.send_headers)
-        try:
-            #res = urllib.request.urlopen(req,timeout=5)
-            #page = res.read()
-            #json_obj = json.loads(page)
-
-            ret = requests.post(self.trade_base_url,
-                                data=myreq, headers=self.send_headers)
-            json_obj = json.loads(ret.text)
-            logging.info('sell success'+'{:}'.format(json_obj))
-        except e:
-            err = 'sell at poloniex error'
-            logging.info(err)
-            logging.info(e)
-            time.sleep(1)
+            self.trade_base_url, post_data.encode('utf-8'), headers=self.send_headers)
+        req.set_proxy('127.0.0.1:8001', 'http')
+        req.set_proxy('127.0.0.1:8001', 'https')
+        # ret = requests.post(self.trade_base_url,
+        # data=myreq, headers=self.send_headers)
+        # json_obj = json.loads(ret.text)
+        res = urllib.request.urlopen(url=req, timeout=5000)
+        page = res.read()
+        json_obj = json.loads(page)
+        logging.info('sell success'+'{:}'.format(json_obj))
 
     def buy(self, symbol, price, num):
         logging.info('start buy:%s,%.2f,%.5f' % (symbol, price, num))
         self.get_balance()
-        if(not self.cur_balances.has_key('USDT')):
+        if('USDT' not in self.cur_balances):
             logging.info('not have money usdt, return')
             return
         to_buy_num = num
@@ -125,34 +122,33 @@ class poloniex_bot():
         myreq['amount'] = to_buy_num
         myreq['command'] = 'buy'
         myreq['nonce'] = int(time.time()*1000)
-        post_data = urllib.urlencode(myreq)
-        mysign = hmac.new(self.secret, post_data, hashlib.sha512).hexdigest()
+        post_data = urllib.parse.urlencode(myreq)
+        mysign = hmac.new(self.secret.encode('utf-8'),
+                          post_data.encode('utf-8'), hashlib.sha512).hexdigest()
         self.send_headers['Sign'] = mysign
         self.send_headers['Key'] = self.apikey
         req = urllib.request.Request(
-            self.trade_base_url, post_data, headers=self.send_headers)
-        try:
-            #res = urllib.request.urlopen(req,timeout=5)
-            #page = res.read()
-            #json_obj = json.loads(page)
+            self.trade_base_url, post_data.encode('utf-8'), headers=self.send_headers)
+        req.set_proxy('127.0.0.1:8001', 'http')
+        req.set_proxy('127.0.0.1:8001', 'https')
+        res = urllib.request.urlopen(req, timeout=5000)
+        page = res.read()
+        json_obj = json.loads(page)
 
-            ret = requests.post(self.trade_base_url,
-                                data=myreq, headers=self.send_headers)
-            json_obj = json.loads(ret.text)
-            logging.info('buy success'+'{:}'.format(json_obj))
-        except e:
-            err = 'buy at poloniex error'
-            logging.info(err)
-            logging.info(e)
-            time.sleep(1)
+        # ret = requests.post(self.trade_base_url,
+        #                    data=myreq, headers=self.send_headers)
+        # json_obj = json.loads(ret.text)
+        logging.info('buy success'+'{:}'.format(json_obj))
 
-    def get_balance(self):
+    def get_open_orders(self):
         self.cur_balances = {}
         self.send_headers = {}
         myreq = {}
-        myreq['command'] = 'returnBalances'
+        myreq['command'] = 'returnOpenOrders'
+        myreq['currencyPair'] = 'USDT_XRP'
         myreq['nonce'] = int(time.time()*1000)
         post_data = urllib.parse.urlencode(myreq, encoding='utf-8')
+        # print("secret:", self.secret)
         mysign = hmac.new(self.secret.encode('utf-8'), post_data.encode('utf-8'),
                           hashlib.sha512).hexdigest()
         self.send_headers['Sign'] = mysign
@@ -163,8 +159,38 @@ class poloniex_bot():
 
         req.set_proxy('127.0.0.1:8001', 'http')
         req.set_proxy('127.0.0.1:8001', 'https')
-        #ret = urllib.request.urlopen(urllib.request.Request('https://poloniex.com/tradingApi', post_data, headers))
-        #elf.send_headers['Key'] = self.apikey
+
+        res = urllib.request.urlopen(url=req, timeout=5000)
+        page = res.read()
+        json_obj = json.loads(page)
+        # print(json_obj['SDC'])
+        # print('{:}'.format(json_obj))
+        for k in json_obj:
+            # print(k['orderNumber'])
+            self.open_orders[k['orderNumber']] = k
+        #logging.info('get open orders:'+'{:}'.format(json_obj))
+        logging.info('get open orders:'+'{:}'.format(self.open_orders))
+
+    def get_balance(self):
+        self.cur_balances = {}
+        self.send_headers = {}
+        myreq = {}
+        myreq['command'] = 'returnBalances'
+        myreq['nonce'] = int(time.time()*1000)
+        post_data = urllib.parse.urlencode(myreq, encoding='utf-8')
+        # print("secret:", self.secret)
+        mysign = hmac.new(self.secret.encode('utf-8'), post_data.encode('utf-8'),
+                          hashlib.sha512).hexdigest()
+        self.send_headers['Sign'] = mysign
+        self.send_headers['Key'] = self.apikey
+        # print('{:}'.format(self.send_headers))
+        req = urllib.request.Request(
+            self.trade_base_url, post_data.encode('utf-8'), headers=self.send_headers)
+
+        req.set_proxy('127.0.0.1:8001', 'http')
+        req.set_proxy('127.0.0.1:8001', 'https')
+        # ret = urllib.request.urlopen(urllib.request.Request('https://poloniex.com/tradingApi', post_data, headers))
+        # elf.send_headers['Key'] = self.apikey
         #    'Sign': mysign,
         #    'Key': self.apikey
         # }
@@ -182,13 +208,13 @@ class poloniex_bot():
 
     def get_ticker(self):
         ticker_url = self.base_url
-        #myreq  = {}
-        #myreq['command'] = 'returnTicker'
-        #myreq['nonce'] = int(time.time()*1000)
-        #post_data = urllib.urlencode(myreq)
-        #mysign = hmac.new(self.secret, post_data, hashlib.sha512).hexdigest()
-        #self.send_headers['Sign'] = mysign
-        #elf.send_headers['Key'] = self.apikey
+        # myreq  = {}
+        # myreq['command'] = 'returnTicker'
+        # myreq['nonce'] = int(time.time()*1000)
+        # post_data = urllib.urlencode(myreq)
+        # mysign = hmac.new(self.secret, post_data, hashlib.sha512).hexdigest()
+        # self.send_headers['Sign'] = mysign
+        # elf.send_headers['Key'] = self.apikey
         #    'Sign': mysign,
         #    'Key': self.apikey
         # }
@@ -265,9 +291,11 @@ if __name__ == "__main__":
     logging.getLogger('').addHandler(console)
     bot = poloniex_bot()
     try:
-        bot.list_price()
-        # bot.get_balance()
-        #info.sell('LTC', 130.0, 0.01)
-        #info.buy('XRP', 0.75, 1.5)
+        # bot.list_price()
+        bot.get_balance()
+        # bot.sell('LTC', 130.0, 0.01)
+        # bot.sell('XRP', 5, 1)
+        # bot.get_open_orders()
+        # bot.buy('XRP', 0.01, 1000)
     except KeyboardInterrupt as e:
         bot.stop()
