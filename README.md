@@ -57,6 +57,8 @@ If you don't need proxy to connect to poloniex, comment out all lines as belows 
 #req.set_proxy('127.0.0.1:8001', 'http')
 #req.set_proxy('127.0.0.1:8001', 'https')
 ```
+Poloniex API document reference:  
+https://docs.poloniex.com/#returnopenorders
 
 
 
