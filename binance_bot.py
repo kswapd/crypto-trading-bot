@@ -23,7 +23,7 @@ proxyDict = {
 }
 proxyDict2 = {
     'http': 'http://127.0.0.1:8001',
-    'https': 'https://127.0.0.1:8001'
+    'https': 'http://127.0.0.1:8001'
 }
 session.proxies.update(proxyDict2)
 retry = Retry(connect=3, backoff_factor=0.5)
