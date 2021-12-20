@@ -46,6 +46,8 @@ class binance_bot():
         # self.coin_url = "https://api.coinmarketcap.com/v1/ticker/?limit=%d"%self.num
         self.base_url = 'https://api.binance.com/api/v3/ticker/price'
         self.account_base_url = 'https://api.binance.com/api/v3/account'
+        self.order_base_url = 'https://api.binance.com/api/v3/order'
+        self.time_base_url = 'https://api.binance.com/api/v3/time'
         self.send_headers = {
             'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
             'accept-encoding': 'gzip, deflate, br',
@@ -112,7 +114,55 @@ class binance_bot():
                 self.cur_balances[m['asset']] = float(m['free'])
 
         print('Get balances:'+'{:}'.format(self.cur_balances))
+
+    def get_server_time(self):
+        response = session.get(self.time_base_url) 
+        json_obj = json.loads(response.content)
+        print('get server time success'+'{:}'.format(json_obj))
+        offset = json_obj['serverTime'] - int(time.time() * 1000)
+        print('time offset:', json_obj['serverTime'], int(time.time() * 1000), offset)
+        return json_obj['serverTime']
         
+    def buy(self, symbol, price, num):
+        print('start buy:', symbol,price,num)
+        #self.send_headers['Sign'] = mysign
+        self.send_headers = {}
+        self.send_headers['X-MBX-APIKEY'] = self.apikey
+        self.cur_balances = {}
+        myreq = {}
+        
+        myreq['symbol'] = symbol
+        myreq['side'] = 'BUY'
+        myreq['type'] = 'LIMIT'
+        myreq['price'] = price
+        myreq['timeInForce'] = 'GTC'
+        myreq['quantity'] = num
+        #myreq['timestamp'] = int(time.time()*1000)
+        myreq['timestamp'] = self.get_server_time()
+        post_data = urllib.parse.urlencode(myreq, encoding='utf-8')
+
+        mysign = hmac.new(self.secret.encode('utf-8'), post_data.encode('utf-8'),
+                          hashlib.sha256).hexdigest()
+        myreq['signature'] = mysign
+
+        post_data = urllib.parse.urlencode(myreq, encoding='utf-8')
+
+        finalReq = self.order_base_url + '?' + post_data
+        print('Request url:', finalReq)
+        #req = urllib.request.Request(
+            #self.account_base_url, post_data.encode('utf-8'), headers=self.send_headers, method="GET")
+
+        response = session.post(finalReq, headers=self.send_headers)
+        json_obj = json.loads(response.content)
+
+
+
+        print('buy success'+'{:}'.format(json_obj))
+        #for m in json_obj['balances']:
+        #    if float(m['free']) > 0.0001:
+        #        self.cur_balances[m['asset']] = float(m['free'])
+
+        #print('Get balances:'+'{:}'.format(self.cur_balances))
     def list_price(self):
         print("Getting cryptocurrency info from url:", self.base_url)
         while not self.is_stop:
@@ -146,6 +196,8 @@ if __name__ == "__main__":
     binance = binance_bot()
     try:
         #binance.list_price()
-        binance.get_balance()
+        #binance.get_balance()
+        #binance.get_server_time()
+        binance.buy('LTCUSDT', 105, 1)
     except KeyboardInterrupt as e:
         binance.stop()
